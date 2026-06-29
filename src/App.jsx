@@ -108,8 +108,9 @@ function renderSizeOptions() {
   ));
 }
 
-function buildSellerCodeMailto({ contactEmail, title, secretCode }) {
-  if (!contactEmail) return "";
+function getSellerCodeEmailDetails({ contactEmail, title, secretCode }) {
+  const to = String(contactEmail || "").trim();
+  if (!to) return null;
 
   const subject = `Your TKD kit listing code: ${title}`;
   const body = [
@@ -133,7 +134,50 @@ function buildSellerCodeMailto({ contactEmail, title, secretCode }) {
     "Thanks for helping the club reuse kit.",
   ].join("\n");
 
-  return `mailto:${encodeURIComponent(contactEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return { to, subject, body };
+}
+
+function buildSellerCodeMailto(submitted) {
+  const email = getSellerCodeEmailDetails(submitted);
+  if (!email) return "";
+
+  // Keep the email address itself human-readable. Some email clients do not like an encoded recipient.
+  return `mailto:${email.to}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`;
+}
+
+function getSellerCodeReminderText(submitted) {
+  const email = getSellerCodeEmailDetails(submitted);
+  if (!email) return `Seller code: ${submitted?.secretCode || ""}`;
+
+  return `${email.subject}\n\n${email.body}`;
+}
+
+async function copyTextToClipboard(text) {
+  if (!text) return false;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fall back to the older textarea method below.
+  }
+
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return copied;
+  } catch {
+    return false;
+  }
 }
 
 function getListingTimestamp(item) {
@@ -2087,6 +2131,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   const [drag, setDrag] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -2110,6 +2155,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
     setAgreed(false);
     setErrors({});
     setSubmitError("");
+    setCopyStatus("");
   };
 
   const handleSubmit = async (event) => {
@@ -2142,6 +2188,19 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   };
 
   if (submitted) {
+    const emailDraftHref = buildSellerCodeMailto(submitted);
+    const reminderText = getSellerCodeReminderText(submitted);
+
+    const handleCopyReminder = async () => {
+      const copied = await copyTextToClipboard(reminderText);
+      setCopyStatus(copied ? "Reminder text copied. Paste it into any email, note or message." : "Copy failed. Please screenshot the code before leaving this page.");
+    };
+
+    const handleCopyCode = async () => {
+      const copied = await copyTextToClipboard(submitted.secretCode);
+      setCopyStatus(copied ? "Seller code copied." : "Copy failed. Please screenshot the code before leaving this page.");
+    };
+
     return (
       <div className="form-section">
         <div className="success-banner" role="status">
@@ -2153,12 +2212,17 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           <div className="secret">{submitted.secretCode}</div>
           <div className="success-actions">
             {submitted.contactEmail && (
-              <a className="btn btn-ghost btn-sm" href={buildSellerCodeMailto(submitted)}>✉️ Email this code to me</a>
+              <a className="btn btn-ghost btn-sm" href={emailDraftHref}>✉️ Open email draft</a>
             )}
+            <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyReminder}>📋 Copy reminder text</button>
+            <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyCode}>Copy code only</button>
           </div>
+          {copyStatus && <p className="success-small-note" role="status"><strong>{copyStatus}</strong></p>}
           <p className="success-small-note">Screenshot this code and keep it safe. Use it to edit your listing or mark it as sold. Please remove the listing if the item sells elsewhere.</p>
-          {!submitted.contactEmail && (
-            <p className="success-small-note"><strong>No email was provided, so we cannot prepare an email reminder.</strong> Copy or screenshot the code before leaving this page.</p>
+          {submitted.contactEmail ? (
+            <p className="success-small-note"><strong>Note:</strong> “Open email draft” uses your device's default email app. If nothing opens, use “Copy reminder text” and paste it into your email or notes.</p>
+          ) : (
+            <p className="success-small-note"><strong>No email was provided.</strong> Use “Copy reminder text”, copy the code, or screenshot it before leaving this page.</p>
           )}
         </div>
         <div className="edit-save-row">
