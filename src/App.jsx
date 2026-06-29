@@ -958,6 +958,7 @@ const styles = `
   .modal-close:hover { background: rgba(200,16,46,0.2); color: #fff; }
 
   .modal-img {
+    position: relative;
     width: 100%; min-height: 280px; height: min(64vh, 520px);
     background:
       radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 48%),
@@ -971,6 +972,67 @@ const styles = `
     padding: 12px;
   }
   .modal-img img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
+  .modal-img-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(6,15,26,0.76);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.30);
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .modal-img-arrow:hover {
+    background: rgba(200,16,46,0.92);
+    border-color: rgba(255,255,255,0.30);
+    transform: translateY(-50%) scale(1.04);
+  }
+  .modal-img-arrow:focus-visible { outline: 3px solid rgba(212,168,67,0.55); outline-offset: 3px; }
+  .modal-img-arrow-left { left: 14px; padding-bottom: 4px; }
+  .modal-img-arrow-right { right: 14px; padding-bottom: 4px; }
+  .modal-img-counter {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    z-index: 4;
+    background: rgba(6,15,26,0.78);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: #F0EDE8;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.26);
+  }
+  .modal-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 0 0;
+    background: #111E2E;
+  }
+  .modal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    padding: 0;
+  }
+  .modal-dot.active { background: #C8102E; }
 
   .modal-body { padding: 24px; }
   .modal-title {
@@ -1394,6 +1456,10 @@ const styles = `
     .sort-select { flex: 1; min-width: 0; }
     .card-img { height: 200px; }
     .card-view-pill { top: 8px; right: 8px; }
+    .modal-img-arrow { width: 38px; height: 38px; font-size: 30px; }
+    .modal-img-arrow-left { left: 10px; }
+    .modal-img-arrow-right { right: 10px; }
+    .modal-img-counter { bottom: 10px; }
   }
 `;
 
@@ -1625,6 +1691,28 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
   const [verifying, setVerifying] = useState(false);
   const [removing, setRemoving] = useState(false);
 
+  const images = Array.isArray(currentItem.images) ? currentItem.images : [];
+  const imageCount = images.length;
+  const hasMultipleImages = imageCount > 1;
+
+  useEffect(() => {
+    if (imgIdx >= imageCount) {
+      setImgIdx(0);
+    }
+  }, [imageCount, imgIdx]);
+
+  const showPreviousImage = (event) => {
+    event?.stopPropagation();
+    if (!hasMultipleImages) return;
+    setImgIdx(index => (index - 1 + imageCount) % imageCount);
+  };
+
+  const showNextImage = (event) => {
+    event?.stopPropagation();
+    if (!hasMultipleImages) return;
+    setImgIdx(index => (index + 1) % imageCount);
+  };
+
   const handleVerify = async () => {
     setVerifying(true);
     setCodeError("");
@@ -1676,29 +1764,50 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
       <div className="modal" role="dialog" aria-modal="true" aria-label={currentItem.title}>
         <button className="modal-close" type="button" onClick={onClose} aria-label="Close listing details">✕</button>
         <div className="modal-img">
-          {currentItem.images && currentItem.images.length > 0 ? (
-            <img
-              src={currentItem.images[imgIdx]}
-              alt={`${currentItem.title} photo ${imgIdx + 1}`}
-              style={{ cursor: currentItem.images.length > 1 ? "pointer" : "default" }}
-              onClick={() => currentItem.images.length > 1 && setImgIdx((imgIdx + 1) % currentItem.images.length)}
-            />
+          {imageCount > 0 ? (
+            <>
+              <img
+                src={images[imgIdx]}
+                alt={`${currentItem.title} photo ${imgIdx + 1}`}
+                style={{ cursor: hasMultipleImages ? "pointer" : "default" }}
+                onClick={(event) => hasMultipleImages && showNextImage(event)}
+              />
+              {hasMultipleImages && (
+                <>
+                  <button
+                    className="modal-img-arrow modal-img-arrow-left"
+                    type="button"
+                    onClick={showPreviousImage}
+                    aria-label="Previous photo"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="modal-img-arrow modal-img-arrow-right"
+                    type="button"
+                    onClick={showNextImage}
+                    aria-label="Next photo"
+                  >
+                    ›
+                  </button>
+                  <div className="modal-img-counter" aria-live="polite">
+                    {imgIdx + 1} / {imageCount}
+                  </div>
+                </>
+              )}
+            </>
           ) : "🥋"}
         </div>
-        {currentItem.images && currentItem.images.length > 1 && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 6, padding: "8px 0 0", background: "#111E2E" }}>
-            {currentItem.images.map((_, i) => (
+        {hasMultipleImages && (
+          <div className="modal-dots">
+            {images.map((_, i) => (
               <button
                 key={i}
+                className={`modal-dot ${i === imgIdx ? "active" : ""}`}
                 type="button"
                 aria-label={`View photo ${i + 1}`}
                 aria-current={i === imgIdx ? "true" : undefined}
                 onClick={() => setImgIdx(i)}
-                style={{
-                  width: 8, height: 8, borderRadius: "50%", border: "none",
-                  background: i === imgIdx ? "#C8102E" : "rgba(255,255,255,0.2)",
-                  cursor: "pointer", padding: 0
-                }}
               />
             ))}
           </div>
