@@ -17,7 +17,7 @@ const ADMIN_SESSION_KEY = "tkd-admin-verified";
 // For a public production marketplace, move admin auth and listing writes to a backend.
 // To enable this temporary client-side admin login, set this to the SHA-256 hex hash
 // of your chosen admin password. Do not put the plain password in this file.
-const ADMIN_PASSWORD_HASH = "";
+const ADMIN_PASSWORD_HASH = "6de571cf9247ac7fda21a1a6ac926d1a664ad9f39361cfea192ff4d91c0df883";
 const ADMIN_PASSWORD_SESSION_KEY = "tkd-admin-password-session";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
