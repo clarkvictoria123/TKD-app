@@ -1,13 +1,59 @@
 import { useState, useEffect, useRef } from "react";
 
-const SIZES = [
-  "XS", "S", "M", "L", "XL",
-  "80cm", "90cm", "100cm", "110cm", "120cm", "130cm", "140cm",
-  "150cm", "160cm", "170cm", "180cm", "190cm", "200cm", "210cm", "220cm"
+const SIZE_GROUPS = [
+  {
+    label: "Adult clothing sizes",
+    options: ["Adult XS", "Adult S", "Adult M", "Adult L", "Adult XL", "Adult XXL"],
+  },
+  {
+    label: "Child clothing sizes",
+    options: ["Child XS", "Child S", "Child M", "Child L", "Child XL", "Child XXL"],
+  },
+  {
+    label: "Dobok height sizes",
+    options: [
+      "80 cm height", "90 cm height", "100 cm height", "110 cm height",
+      "120 cm height", "130 cm height", "140 cm height", "150 cm height",
+      "160 cm height", "170 cm height", "180 cm height", "190 cm height",
+      "200 cm height", "210 cm height", "220 cm height",
+    ],
+  },
+  {
+    label: "Other",
+    options: ["One Size", "Unknown / label missing"],
+  },
 ];
+const SIZES = SIZE_GROUPS.flatMap(group => group.options);
 const CONDITIONS = ["Like New", "Good", "Fair", "Well Loved"];
-const COLORS = ["White", "Black", "Blue", "Other"];
-const EQUIPMENT_TYPES = ["Dobok", "Body Armour", "Helmet", "Sparring Gloves", "Foot Protectors", "Other"];
+const EQUIPMENT_TYPES = [
+  "Dobok",
+  "Body Armour",
+  "Belt",
+  "Paddles / Training Aids",
+  "T-Shirts & Hoodies",
+  "Other Clothing",
+  "Other",
+];
+const PROTECTIVE_EQUIPMENT_TYPES = new Set([
+  "Body Armour",
+  "Helmet",
+  "Head Guard",
+  "Headguard",
+  "Sparring Gloves",
+  "Gloves",
+  "Foot Protectors",
+  "Foot Guards",
+  "Shin Guards",
+  "Forearm Guards",
+  "Chest Guard",
+  "Chest Protector",
+]);
+
+function normaliseEquipmentType(value) {
+  const clean = String(value || "").trim();
+  if (!clean) return "";
+  return PROTECTIVE_EQUIPMENT_TYPES.has(clean) ? "Body Armour" : clean;
+}
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest to Oldest" },
   { value: "oldest", label: "Oldest to Newest" },
@@ -52,6 +98,42 @@ function formatDateShort(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function renderSizeOptions() {
+  return SIZE_GROUPS.map(group => (
+    <optgroup key={group.label} label={group.label}>
+      {group.options.map(size => <option key={size} value={size}>{size}</option>)}
+    </optgroup>
+  ));
+}
+
+function buildSellerCodeMailto({ contactEmail, title, secretCode }) {
+  if (!contactEmail) return "";
+
+  const subject = `Your TKD kit listing code: ${title}`;
+  const body = [
+    "Hi,",
+    "",
+    `Your listing "${title}" is now live on the Phoenix TKD kit marketplace.`,
+    "",
+    `Your seller code is: ${secretCode}`,
+    "",
+    "Keep this code safe. You will need it to edit your listing or mark the item as sold.",
+    "",
+    "How to edit or remove your listing:",
+    "1. Open the marketplace.",
+    "2. Click your listing card.",
+    "3. Scroll to the owner section.",
+    "4. Enter this seller code.",
+    "5. Choose Edit Listing or Mark as Sold.",
+    "",
+    "Housekeeping reminder: please remove the listing once your item has sold, including if it sells elsewhere.",
+    "",
+    "Thanks for helping the club reuse kit.",
+  ].join("\n");
+
+  return `mailto:${encodeURIComponent(contactEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function getListingTimestamp(item) {
@@ -215,7 +297,7 @@ function databaseRowToListing(row) {
     id: row.id,
     title: row.title || "",
     brand: row.brand || "",
-    equipmentType: row.equipment_type || "",
+    equipmentType: normaliseEquipmentType(row.equipment_type),
     size: row.size || "",
     color: row.color || "",
     condition: row.condition || "",
@@ -233,7 +315,7 @@ function listingToDatabasePayload(item) {
   return {
     title: item.title || "",
     brand: item.brand || "",
-    equipmentType: item.equipmentType || "",
+    equipmentType: normaliseEquipmentType(item.equipmentType),
     size: item.size || "",
     color: item.color || "",
     condition: item.condition || "",
@@ -306,6 +388,7 @@ function normaliseListing(listing) {
   return {
     ...listing,
     id: listing.id || generateId(),
+    equipmentType: normaliseEquipmentType(listing.equipmentType),
     price: Number(listing.price) || 0,
     images: Array.isArray(listing.images) ? listing.images : [],
     listedAt: listing.listedAt || new Date().toISOString(),
@@ -469,23 +552,23 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap');
 
   :root {
-    --ink: #0f172a;
-    --ink-soft: #334155;
-    --muted: #64748b;
-    --faint: #94a3b8;
-    --line: #e5eaf3;
+    --ink: #07111f;
+    --ink-soft: #243447;
+    --muted: #53657d;
+    --faint: #8190a5;
+    --line: #d7e0ec;
     --surface: #ffffff;
-    --surface-soft: #f7faff;
-    --surface-blue: #eef6ff;
-    --primary: #0757c8;
-    --primary-dark: #063f98;
-    --primary-soft: rgba(7,87,200,0.10);
-    --primary-line: rgba(7,87,200,0.22);
-    --success: #15803d;
-    --warning: #b45309;
-    --danger: #dc2626;
-    --shadow-sm: 0 8px 22px rgba(15,23,42,0.08);
-    --shadow-md: 0 16px 40px rgba(15,23,42,0.12);
+    --surface-soft: #edf3fb;
+    --surface-blue: #e0edff;
+    --primary: #0648a8;
+    --primary-dark: #032f73;
+    --primary-soft: rgba(6,72,168,0.12);
+    --primary-line: rgba(6,72,168,0.28);
+    --success: #14713a;
+    --warning: #a65a08;
+    --danger: #c91f2d;
+    --shadow-sm: 0 9px 24px rgba(7,17,31,0.11);
+    --shadow-md: 0 18px 44px rgba(7,17,31,0.16);
     --radius: 22px;
   }
 
@@ -495,8 +578,9 @@ const styles = `
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at top left, rgba(7,87,200,0.12), transparent 34rem),
-      linear-gradient(180deg, #fbfcff 0%, #f3f7fd 44%, #eef4fb 100%);
+      radial-gradient(circle at top left, rgba(6,72,168,0.18), transparent 34rem),
+      radial-gradient(circle at bottom right, rgba(3,47,115,0.10), transparent 32rem),
+      linear-gradient(180deg, #f4f7fc 0%, #eaf1fa 44%, #dfe9f5 100%);
     color: var(--ink);
     font-family: 'Barlow', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -506,8 +590,8 @@ const styles = `
 
   /* NAV */
   .nav {
-    background: rgba(255,255,255,0.90);
-    border-bottom: 1px solid rgba(226,232,240,0.82);
+    background: rgba(247,250,255,0.94);
+    border-bottom: 1px solid rgba(187,199,216,0.82);
     backdrop-filter: blur(16px);
     padding: 0 32px;
     display: flex;
@@ -533,7 +617,7 @@ const styles = `
     height: 42px;
     border-radius: 14px;
     background: linear-gradient(135deg, var(--primary), #1d7cf2);
-    box-shadow: 0 10px 22px rgba(7,87,200,0.22);
+    box-shadow: 0 10px 22px rgba(6,72,168,0.22);
   }
   .nav-logo span { color: var(--primary); }
   .nav-tabs { display: flex; gap: 8px; align-items: center; }
@@ -554,7 +638,7 @@ const styles = `
     color: #fff;
     background: var(--primary);
     border-color: var(--primary);
-    box-shadow: 0 10px 22px rgba(7,87,200,0.22);
+    box-shadow: 0 10px 22px rgba(6,72,168,0.22);
   }
   .badge {
     background: var(--primary);
@@ -572,8 +656,8 @@ const styles = `
     position: relative;
     overflow: hidden;
     background:
-      linear-gradient(90deg, rgba(255,255,255,0.99) 0%, rgba(255,255,255,0.92) 42%, rgba(235,244,255,0.92) 100%),
-      radial-gradient(circle at 80% 20%, rgba(7,87,200,0.18), transparent 28rem);
+      linear-gradient(90deg, rgba(248,251,255,0.99) 0%, rgba(244,248,253,0.93) 42%, rgba(213,228,247,0.94) 100%),
+      radial-gradient(circle at 80% 20%, rgba(6,72,168,0.22), transparent 28rem);
     border-bottom: 1px solid var(--line);
   }
   .hero::before {
@@ -581,8 +665,8 @@ const styles = `
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(120deg, transparent 0 58%, rgba(7,87,200,0.06) 58% 100%),
-      radial-gradient(circle at 100% 0%, rgba(7,87,200,0.10), transparent 22rem);
+      linear-gradient(120deg, transparent 0 58%, rgba(6,72,168,0.08) 58% 100%),
+      radial-gradient(circle at 100% 0%, rgba(6,72,168,0.12), transparent 22rem);
     pointer-events: none;
   }
   .hero-inner {
@@ -599,6 +683,7 @@ const styles = `
   .hero-copy { position: relative; z-index: 2; }
   .hero-kicker {
     display: inline-flex;
+    text-decoration: none;
     align-items: center;
     gap: 8px;
     margin-bottom: 14px;
@@ -745,8 +830,8 @@ const styles = `
     width: 24%;
     height: 31%;
     border-radius: 38% 46% 46% 38%;
-    background: linear-gradient(135deg, #0757c8, #053b8f);
-    box-shadow: 0 26px 38px rgba(7,87,200,0.24), inset -12px -10px 26px rgba(0,0,0,0.16);
+    background: linear-gradient(135deg, #0648a8, #053b8f);
+    box-shadow: 0 26px 38px rgba(6,72,168,0.24), inset -12px -10px 26px rgba(0,0,0,0.16);
     transform: rotate(9deg);
   }
   .helmet-piece::after {
@@ -791,7 +876,7 @@ const styles = `
       linear-gradient(90deg, transparent 0 10%, rgba(255,255,255,0.16) 10% 12%, transparent 12% 100%),
       repeating-linear-gradient(90deg, transparent 0 18%, rgba(255,255,255,0.12) 18% 19%, transparent 19% 28%),
       linear-gradient(145deg, #1f72db, #06439c);
-    box-shadow: 0 24px 44px rgba(7,87,200,0.28), inset 0 0 0 2px rgba(255,255,255,0.18);
+    box-shadow: 0 24px 44px rgba(6,72,168,0.28), inset 0 0 0 2px rgba(255,255,255,0.18);
     transform: rotate(4deg);
   }
   .armour-piece::before {
@@ -831,7 +916,7 @@ const styles = `
     height: 28px;
     border-radius: 999px;
     background: linear-gradient(180deg, #1c73dc, #073e98);
-    box-shadow: 0 22px 26px rgba(7,87,200,0.25), inset 0 6px 0 rgba(255,255,255,0.15);
+    box-shadow: 0 22px 26px rgba(6,72,168,0.25), inset 0 6px 0 rgba(255,255,255,0.15);
     transform: rotate(-5deg);
   }
   .hero-belt::before,
@@ -856,7 +941,7 @@ const styles = `
     height: 46px;
     border-radius: 14px;
     background: linear-gradient(135deg, #207ce8, #043a90);
-    box-shadow: inset 0 3px 0 rgba(255,255,255,0.16), 0 10px 18px rgba(7,87,200,0.20);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.16), 0 10px 18px rgba(6,72,168,0.20);
   }
   .glove-piece {
     position: absolute;
@@ -904,7 +989,7 @@ const styles = `
     gap: 18px;
     margin-bottom: 24px;
     padding: 18px 22px;
-    background: rgba(255,255,255,0.92);
+    background: rgba(250,252,255,0.94);
     border: 1px solid var(--line);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
@@ -967,7 +1052,7 @@ const styles = `
   .form-select:focus,
   .form-textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(7,87,200,0.11);
+    box-shadow: 0 0 0 4px rgba(6,72,168,0.11);
   }
   .store-note {
     display: flex;
@@ -979,7 +1064,7 @@ const styles = `
     padding: 14px 16px;
     border: 1px solid var(--primary-line);
     border-radius: 14px;
-    background: linear-gradient(90deg, rgba(7,87,200,0.08), rgba(255,255,255,0.88));
+    background: linear-gradient(90deg, rgba(6,72,168,0.08), rgba(255,255,255,0.88));
     color: var(--ink-soft);
     font-size: 14px;
     font-weight: 500;
@@ -1051,7 +1136,7 @@ const styles = `
     appearance: none;
   }
   .card:hover { transform: translateY(-5px); border-color: var(--primary-line); box-shadow: 0 22px 46px rgba(15,23,42,0.14); }
-  .card:focus-visible { outline: 4px solid rgba(7,87,200,0.18); outline-offset: 3px; }
+  .card:focus-visible { outline: 4px solid rgba(6,72,168,0.18); outline-offset: 3px; }
   .card::before { content: none; }
   .card-img {
     width: 100%;
@@ -1314,6 +1399,9 @@ const styles = `
   .form-group { margin-bottom: 20px; }
   .form-label { display: block; font-size: 12px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   .form-label .req { color: var(--danger); margin-left: 3px; }
+  .form-hint { margin-top: 7px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .field-note { margin-top: -8px; margin-bottom: 16px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+  .contact-note { background: var(--surface-blue); border: 1px solid var(--primary-line); color: var(--primary-dark); border-radius: 14px; padding: 12px 14px; margin: -2px 0 16px; font-size: 14px; line-height: 1.45; }
   .form-input, .form-select, .form-textarea {
     width: 100%;
     background: #fff;
@@ -1330,7 +1418,8 @@ const styles = `
   .form-input::placeholder, .form-textarea::placeholder { color: var(--faint); }
   .form-textarea { min-height: 104px; resize: vertical; line-height: 1.5; }
   .form-select { cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, var(--primary) 50%), linear-gradient(135deg, var(--primary) 50%, transparent 50%); background-position: calc(100% - 18px) 52%, calc(100% - 12px) 52%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; padding-right: 38px; }
-  .form-select option { background: #fff; color: var(--ink); }
+  .form-select option, .form-select optgroup { background: #fff; color: var(--ink); }
+  .form-select optgroup { font-weight: 900; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .upload-area {
     border: 2px dashed #cbd5e1;
@@ -1359,6 +1448,7 @@ const styles = `
   .btn {
     font-family: inherit;
     font-weight: 900;
+    text-decoration: none;
     font-size: 15px;
     padding: 12px 22px;
     border-radius: 12px;
@@ -1370,7 +1460,7 @@ const styles = `
     justify-content: center;
     gap: 8px;
   }
-  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 22px rgba(7,87,200,0.20); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 22px rgba(6,72,168,0.20); }
   .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
   .btn-primary:disabled { background: #bfdbfe; color: #eff6ff; cursor: not-allowed; box-shadow: none; }
   .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(15,23,42,0.06); }
@@ -1389,6 +1479,8 @@ const styles = `
   .success-banner h3 { color: var(--success); font-size: 20px; margin-bottom: 8px; }
   .success-banner p { color: var(--muted); font-size: 15px; line-height: 1.5; }
   .success-banner .secret { margin-top: 14px; background: #fff; border: 1px dashed rgba(21,128,61,0.34); border-radius: 12px; padding: 12px 16px; font-family: monospace; font-size: 22px; letter-spacing: 0.15em; color: var(--success); font-weight: 900; }
+  .success-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+  .success-small-note { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.45; }
 
   /* ADMIN */
   .admin-login-box { max-width: 420px; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 30px; margin: 60px auto; text-align: center; box-shadow: var(--shadow-sm); }
@@ -1561,7 +1653,7 @@ function UniformCard({ item, onClick }) {
           <div className="card-price">{formatPrice(item.price)}</div>
         </div>
         <div className="card-tags">
-          {item.equipmentType && <span className="tag" style={{ background: "rgba(7,87,200,0.10)", color: "#0757c8" }}>{item.equipmentType}</span>}
+          {item.equipmentType && <span className="tag" style={{ background: "rgba(6,72,168,0.12)", color: "#0648a8" }}>{item.equipmentType}</span>}
           {item.size && <span className="tag">{item.size}</span>}
           {item.color && <span className="tag">{item.color}</span>}
           {item.condition && <span className={`tag ${conditionClass(item.condition)}`}>{item.condition}</span>}
@@ -1581,7 +1673,7 @@ function EditForm({ item, onSave, onCancel }) {
   const [form, setForm] = useState({
     title: item.title || "",
     brand: item.brand || "",
-    equipmentType: item.equipmentType || "",
+    equipmentType: normaliseEquipmentType(item.equipmentType),
     size: item.size || "",
     color: item.color || "",
     condition: item.condition || "",
@@ -1607,7 +1699,7 @@ function EditForm({ item, onSave, onCancel }) {
     if (!form.condition) e.condition = "Please select a condition";
     if (!form.price || isNaN(form.price) || Number(form.price) <= 0) e.price = "Please enter a valid price";
     if (!form.contactName.trim()) e.contactName = "Your name is required";
-    if (!form.contactPhone.trim() && !form.contactEmail.trim()) e.contactEmail = "Please provide at least one contact method";
+    if (!form.contactPhone.trim() && !form.contactEmail.trim()) e.contactEmail = "Please provide at least one contact method: phone/WhatsApp or email";
     return e;
   };
 
@@ -1653,6 +1745,7 @@ function EditForm({ item, onSave, onCancel }) {
           <option value="">— Select —</option>
           {EQUIPMENT_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
+        <div className="form-hint">Choose Body Armour for protective kit such as chest guards, head guards, gloves, shin/forearm guards and foot protectors.</div>
       </div>
 
       <div className="form-row">
@@ -1660,16 +1753,15 @@ function EditForm({ item, onSave, onCancel }) {
           <label className="form-label" htmlFor="edit-size">Size <span className="req">*</span></label>
           <select id="edit-size" className="form-select" value={form.size} onChange={e => set("size", e.target.value)}>
             <option value="">— Select —</option>
-            {SIZES.map(s => <option key={s}>{s}</option>)}
+            {renderSizeOptions()}
           </select>
           {errors.size && <div className="error-msg">{errors.size}</div>}
+          <div className="form-hint">For doboks, cm sizes refer to approximate wearer height.</div>
         </div>
         <div className="form-group">
           <label className="form-label" htmlFor="edit-color">Colour</label>
-          <select id="edit-color" className="form-select" value={form.color} onChange={e => set("color", e.target.value)}>
-            <option value="">— Select —</option>
-            {COLORS.map(c => <option key={c}>{c}</option>)}
-          </select>
+          <input id="edit-color" className="form-input" placeholder="e.g. white, blue, red, black" value={form.color} onChange={e => set("color", e.target.value)} />
+          <div className="form-hint">Type the colour shown on the item label or in the photos.</div>
         </div>
       </div>
 
@@ -1720,8 +1812,10 @@ function EditForm({ item, onSave, onCancel }) {
       </div>
 
       <div style={{ paddingTop: 4, marginBottom: 4 }}>
-        <div className="form-label" style={{ fontSize: 13, color: "#0757c8", marginBottom: 12 }}>Contact Details</div>
+        <div className="form-label" style={{ fontSize: 13, color: "#0648a8", marginBottom: 12 }}>Contact Details</div>
       </div>
+
+      <div className="contact-note">You can provide phone/WhatsApp, email, or both. At least one contact method is required so buyers can reach you.</div>
 
       <div className="form-group">
         <label className="form-label" htmlFor="edit-contact-name">Name <span className="req">*</span></label>
@@ -1905,7 +1999,7 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
                 onClick={() => setImgIdx(i)}
                 style={{
                   width: 8, height: 8, borderRadius: "50%", border: "none",
-                  background: i === imgIdx ? "#0757c8" : "rgba(7,87,200,0.18)",
+                  background: i === imgIdx ? "#0648a8" : "rgba(6,72,168,0.18)",
                   cursor: "pointer", padding: 0
                 }}
               />
@@ -1916,7 +2010,7 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
           <div className="modal-title">{currentItem.title}</div>
           <div className="modal-price">{formatPrice(currentItem.price)}</div>
           <div className="modal-tags">
-            {currentItem.equipmentType && <span className="tag" style={{ background: "rgba(7,87,200,0.10)", color: "#0757c8" }}>{currentItem.equipmentType}</span>}
+            {currentItem.equipmentType && <span className="tag" style={{ background: "rgba(6,72,168,0.12)", color: "#0648a8" }}>{currentItem.equipmentType}</span>}
             {currentItem.size && <span className="tag">{currentItem.size}</span>}
             {currentItem.color && <span className="tag">{currentItem.color}</span>}
             {currentItem.condition && <span className={`tag ${conditionClass(currentItem.condition)}`}>{currentItem.condition}</span>}
@@ -2003,7 +2097,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
     if (!form.condition) e.condition = "Please select a condition";
     if (!form.price || isNaN(form.price) || Number(form.price) <= 0) e.price = "Please enter a valid price";
     if (!form.contactName.trim()) e.contactName = "Your name is required";
-    if (!form.contactPhone.trim() && !form.contactEmail.trim()) e.contactEmail = "Please provide at least one contact method";
+    if (!form.contactPhone.trim() && !form.contactEmail.trim()) e.contactEmail = "Please provide at least one contact method: phone/WhatsApp or email";
     if (!agreed) e.agreed = "You must agree to the Terms & Conditions to submit a listing";
     return e;
   };
@@ -2039,7 +2133,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
       };
 
       await onSubmitted(newItem);
-      setSubmitted({ secretCode, title: newItem.title });
+      setSubmitted({ secretCode, title: newItem.title, contactEmail: form.contactEmail.trim() });
     } catch (error) {
       setSubmitError(getStorageErrorMessage(error));
     } finally {
@@ -2057,7 +2151,15 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
             Save your secret code — you'll need it to edit or mark your item as sold.
           </p>
           <div className="secret">{submitted.secretCode}</div>
-          <p style={{ marginTop: 10, fontSize: 12 }}>Screenshot this code and keep it safe. It cannot be recovered later.</p>
+          <div className="success-actions">
+            {submitted.contactEmail && (
+              <a className="btn btn-ghost btn-sm" href={buildSellerCodeMailto(submitted)}>✉️ Email this code to me</a>
+            )}
+          </div>
+          <p className="success-small-note">Screenshot this code and keep it safe. Use it to edit your listing or mark it as sold. Please remove the listing if the item sells elsewhere.</p>
+          {!submitted.contactEmail && (
+            <p className="success-small-note"><strong>No email was provided, so we cannot prepare an email reminder.</strong> Copy or screenshot the code before leaving this page.</p>
+          )}
         </div>
         <div className="edit-save-row">
           <button className="btn btn-primary" style={{ flex: 1 }} type="button" onClick={onViewStore}>
@@ -2093,6 +2195,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           <option value="">— Select —</option>
           {EQUIPMENT_TYPES.map(t => <option key={t}>{t}</option>)}
         </select>
+        <div className="form-hint">Choose Body Armour for protective kit such as chest guards, head guards, gloves, shin/forearm guards and foot protectors.</div>
       </div>
 
       <div className="form-row">
@@ -2100,16 +2203,15 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           <label className="form-label" htmlFor="listing-size">Size <span className="req">*</span></label>
           <select id="listing-size" className="form-select" value={form.size} onChange={e => set("size", e.target.value)}>
             <option value="">— Select —</option>
-            {SIZES.map(s => <option key={s}>{s}</option>)}
+            {renderSizeOptions()}
           </select>
           {errors.size && <div className="error-msg">{errors.size}</div>}
+          <div className="form-hint">For doboks, cm sizes refer to approximate wearer height.</div>
         </div>
         <div className="form-group">
           <label className="form-label" htmlFor="listing-color">Colour</label>
-          <select id="listing-color" className="form-select" value={form.color} onChange={e => set("color", e.target.value)}>
-            <option value="">— Select —</option>
-            {COLORS.map(c => <option key={c}>{c}</option>)}
-          </select>
+          <input id="listing-color" className="form-input" placeholder="e.g. white, blue, red, black" value={form.color} onChange={e => set("color", e.target.value)} />
+          <div className="form-hint">Type the colour shown on the item label or in the photos.</div>
         </div>
       </div>
 
@@ -2160,8 +2262,10 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
       </div>
 
       <div style={{ paddingTop: 12, marginBottom: 4 }}>
-        <div className="form-label" style={{ fontSize: 14, color: "#0757c8", marginBottom: 14 }}>Your Contact Details</div>
+        <div className="form-label" style={{ fontSize: 14, color: "#0648a8", marginBottom: 14 }}>Your Contact Details</div>
       </div>
+
+      <div className="contact-note">You can provide phone/WhatsApp, email, or both. At least one contact method is required so buyers can reach you.</div>
 
       <div className="form-group">
         <label className="form-label" htmlFor="listing-contact-name">Your Name <span className="req">*</span></label>
@@ -2184,7 +2288,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
       <div className="secret-box" style={{ marginBottom: 20 }}>
         <p>
           <strong>🔒 About your secret code</strong>
-          After submitting, you'll receive an {CODE_LENGTH}-character code. When your item sells, enter this code on the listing to edit or remove it from the shop. Keep it safe — we can't recover lost codes.
+          After submitting, you'll receive an {CODE_LENGTH}-character code. When your item sells, click your listing and enter this code to edit or remove it from the shop. If you add an email address, the next screen can open a ready-made email with the code and housekeeping reminder.
         </p>
       </div>
 
@@ -2388,7 +2492,7 @@ function AdminPage({ listings, onDelete, onLogout }) {
                   </td>
                   <td>{l.equipmentType || "—"}</td>
                   <td>{l.size || "—"}</td>
-                  <td style={{ color: "#0757c8", fontWeight: 700 }}>{formatPrice(l.price)}</td>
+                  <td style={{ color: "#0648a8", fontWeight: 700 }}>{formatPrice(l.price)}</td>
                   <td>{l.contactName}</td>
                   <td>
                     {l.contactPhone && <small>📱 {l.contactPhone}</small>}
@@ -2568,9 +2672,9 @@ export default function App() {
     { base: "#228B22", stripe: null },           // Green
     { base: "#228B22", stripe: "#1E3A8A" },      // Green with blue stripe
     { base: "#1E3A8A", stripe: null },           // Blue
-    { base: "#1E3A8A", stripe: "#0757c8" },      // Blue with red stripe
-    { base: "#0757c8", stripe: null },           // Red
-    { base: "#0757c8", stripe: "#1A1A1A" },      // Red with black stripe
+    { base: "#1E3A8A", stripe: "#0648a8" },      // Blue with red stripe
+    { base: "#0648a8", stripe: null },           // Red
+    { base: "#0648a8", stripe: "#1A1A1A" },      // Red with black stripe
     { base: "#1A1A1A", stripe: null },           // Black
   ];
 
@@ -2591,7 +2695,7 @@ export default function App() {
           <span style={{ fontSize: 26, lineHeight: 1 }}>🥋</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.2 }}>
-              PHOENIX <span style={{ color: "#0757c8" }}>TKD KIT</span>
+              PHOENIX <span style={{ color: "#0648a8" }}>TKD KIT</span>
             </div>
             <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#64748b", lineHeight: 1.2, textTransform: "uppercase" }}>
               Pre-loved kit marketplace
