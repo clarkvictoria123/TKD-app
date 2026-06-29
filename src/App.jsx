@@ -578,18 +578,18 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap');
 
   :root {
-    --ink: #07111f;
-    --ink-soft: #243447;
-    --muted: #53657d;
-    --faint: #8190a5;
-    --line: #d7e0ec;
+    --ink: #130b0e;
+    --ink-soft: #2f2026;
+    --muted: #6f5b63;
+    --faint: #9b8790;
+    --line: #dccbd0;
     --surface: #ffffff;
-    --surface-soft: #edf3fb;
-    --surface-blue: #e0edff;
-    --primary: #0648a8;
-    --primary-dark: #032f73;
-    --primary-soft: rgba(6,72,168,0.12);
-    --primary-line: rgba(6,72,168,0.28);
+    --surface-soft: #f5edf0;
+    --surface-blue: #fde8ee;
+    --primary: #c8102e;
+    --primary-dark: #8f1021;
+    --primary-soft: rgba(200,16,46,0.12);
+    --primary-line: rgba(200,16,46,0.28);
     --success: #14713a;
     --warning: #a65a08;
     --danger: #c91f2d;
@@ -604,9 +604,9 @@ const styles = `
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at top left, rgba(6,72,168,0.18), transparent 34rem),
-      radial-gradient(circle at bottom right, rgba(3,47,115,0.10), transparent 32rem),
-      linear-gradient(180deg, #f4f7fc 0%, #eaf1fa 44%, #dfe9f5 100%);
+      radial-gradient(circle at top left, rgba(200,16,46,0.18), transparent 34rem),
+      radial-gradient(circle at bottom right, rgba(95,15,32,0.12), transparent 32rem),
+      linear-gradient(180deg, #f6f1f3 0%, #ece4e7 44%, #ded6dc 100%);
     color: var(--ink);
     font-family: 'Barlow', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -616,8 +616,8 @@ const styles = `
 
   /* NAV */
   .nav {
-    background: rgba(247,250,255,0.94);
-    border-bottom: 1px solid rgba(187,199,216,0.82);
+    background: rgba(250,246,247,0.95);
+    border-bottom: 1px solid rgba(202,178,186,0.84);
     backdrop-filter: blur(16px);
     padding: 0 32px;
     display: flex;
@@ -642,8 +642,8 @@ const styles = `
     width: 42px;
     height: 42px;
     border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary), #1d7cf2);
-    box-shadow: 0 10px 22px rgba(6,72,168,0.22);
+    background: linear-gradient(135deg, var(--primary), #e11d48);
+    box-shadow: 0 10px 22px rgba(200,16,46,0.22);
   }
   .nav-logo span { color: var(--primary); }
   .nav-tabs { display: flex; gap: 8px; align-items: center; }
@@ -664,7 +664,7 @@ const styles = `
     color: #fff;
     background: var(--primary);
     border-color: var(--primary);
-    box-shadow: 0 10px 22px rgba(6,72,168,0.22);
+    box-shadow: 0 10px 22px rgba(200,16,46,0.22);
   }
   .badge {
     background: var(--primary);
@@ -683,7 +683,7 @@ const styles = `
     overflow: hidden;
     background:
       linear-gradient(90deg, rgba(248,251,255,0.99) 0%, rgba(244,248,253,0.93) 42%, rgba(213,228,247,0.94) 100%),
-      radial-gradient(circle at 80% 20%, rgba(6,72,168,0.22), transparent 28rem);
+      radial-gradient(circle at 80% 20%, rgba(200,16,46,0.20), transparent 28rem);
     border-bottom: 1px solid var(--line);
   }
   .hero::before {
@@ -691,8 +691,8 @@ const styles = `
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(120deg, transparent 0 58%, rgba(6,72,168,0.08) 58% 100%),
-      radial-gradient(circle at 100% 0%, rgba(6,72,168,0.12), transparent 22rem);
+      linear-gradient(120deg, transparent 0 58%, rgba(200,16,46,0.08) 58% 100%),
+      radial-gradient(circle at 100% 0%, rgba(200,16,46,0.12), transparent 22rem);
     pointer-events: none;
   }
   .hero-inner {
@@ -856,8 +856,8 @@ const styles = `
     width: 24%;
     height: 31%;
     border-radius: 38% 46% 46% 38%;
-    background: linear-gradient(135deg, #0648a8, #053b8f);
-    box-shadow: 0 26px 38px rgba(6,72,168,0.24), inset -12px -10px 26px rgba(0,0,0,0.16);
+    background: linear-gradient(135deg, #c8102e, #8f1021);
+    box-shadow: 0 26px 38px rgba(200,16,46,0.24), inset -12px -10px 26px rgba(0,0,0,0.16);
     transform: rotate(9deg);
   }
   .helmet-piece::after {
@@ -901,8 +901,8 @@ const styles = `
     background:
       linear-gradient(90deg, transparent 0 10%, rgba(255,255,255,0.16) 10% 12%, transparent 12% 100%),
       repeating-linear-gradient(90deg, transparent 0 18%, rgba(255,255,255,0.12) 18% 19%, transparent 19% 28%),
-      linear-gradient(145deg, #1f72db, #06439c);
-    box-shadow: 0 24px 44px rgba(6,72,168,0.28), inset 0 0 0 2px rgba(255,255,255,0.18);
+      linear-gradient(145deg, #e11d48, #9f1239);
+    box-shadow: 0 24px 44px rgba(200,16,46,0.28), inset 0 0 0 2px rgba(255,255,255,0.18);
     transform: rotate(4deg);
   }
   .armour-piece::before {
@@ -941,8 +941,8 @@ const styles = `
     width: 48%;
     height: 28px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #1c73dc, #073e98);
-    box-shadow: 0 22px 26px rgba(6,72,168,0.25), inset 0 6px 0 rgba(255,255,255,0.15);
+    background: linear-gradient(180deg, #c8102e, #8f1021);
+    box-shadow: 0 22px 26px rgba(200,16,46,0.25), inset 0 6px 0 rgba(255,255,255,0.15);
     transform: rotate(-5deg);
   }
   .hero-belt::before,
@@ -966,8 +966,8 @@ const styles = `
     width: 54px;
     height: 46px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #207ce8, #043a90);
-    box-shadow: inset 0 3px 0 rgba(255,255,255,0.16), 0 10px 18px rgba(6,72,168,0.20);
+    background: linear-gradient(135deg, #e11d48, #8f1021);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.16), 0 10px 18px rgba(200,16,46,0.20);
   }
   .glove-piece {
     position: absolute;
@@ -1078,7 +1078,7 @@ const styles = `
   .form-select:focus,
   .form-textarea:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(6,72,168,0.11);
+    box-shadow: 0 0 0 4px rgba(200,16,46,0.11);
   }
   .store-note {
     display: flex;
@@ -1090,7 +1090,7 @@ const styles = `
     padding: 14px 16px;
     border: 1px solid var(--primary-line);
     border-radius: 14px;
-    background: linear-gradient(90deg, rgba(6,72,168,0.08), rgba(255,255,255,0.88));
+    background: linear-gradient(90deg, rgba(200,16,46,0.08), rgba(255,255,255,0.88));
     color: var(--ink-soft);
     font-size: 14px;
     font-weight: 500;
@@ -1162,7 +1162,7 @@ const styles = `
     appearance: none;
   }
   .card:hover { transform: translateY(-5px); border-color: var(--primary-line); box-shadow: 0 22px 46px rgba(15,23,42,0.14); }
-  .card:focus-visible { outline: 4px solid rgba(6,72,168,0.18); outline-offset: 3px; }
+  .card:focus-visible { outline: 4px solid rgba(200,16,46,0.18); outline-offset: 3px; }
   .card::before { content: none; }
   .card-img {
     width: 100%;
@@ -1269,50 +1269,26 @@ const styles = `
     font-size: 14px;
     line-height: 1.45;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .card-listed { margin-top: 10px; color: var(--faint); font-size: 13px; }
-  .card-seller-box {
+  .card-footer-row {
     margin-top: 14px;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: linear-gradient(180deg, #fff, #f8fafc);
-    color: var(--muted);
-    display: grid;
-    grid-template-columns: 38px minmax(0, 1fr);
-    gap: 8px 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--faint);
+    font-size: 13px;
+    font-weight: 700;
   }
-  .card-seller-box::before {
-    content: "👤";
-    width: 38px;
-    height: 38px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--surface-soft);
-    grid-row: 1 / span 2;
-  }
-  .card-seller-label {
-    grid-column: 2;
-    display: block;
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.1;
-  }
-  .card-seller-box strong {
-    grid-column: 2;
-    color: var(--ink);
-    display: block;
-    font-size: 15px;
-    line-height: 1.25;
-    min-width: 0;
-    overflow-wrap: anywhere;
-    white-space: normal;
+  .card-footer-cta {
+    color: var(--primary);
+    font-weight: 900;
+    white-space: nowrap;
   }
 
   .empty-state { grid-column: 1/-1; text-align: center; padding: 70px 20px; color: var(--muted); }
@@ -1428,7 +1404,7 @@ const styles = `
     height: 5px;
     margin: -30px -30px 26px;
     border-radius: var(--radius) var(--radius) 0 0;
-    background: linear-gradient(90deg, var(--primary), #3b82f6);
+    background: linear-gradient(90deg, var(--primary), #e11d48);
   }
   .form-title, .admin-title, .tc-title, .edit-modal-title {
     color: var(--ink);
@@ -1503,7 +1479,7 @@ const styles = `
     justify-content: center;
     gap: 8px;
   }
-  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 22px rgba(6,72,168,0.20); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 12px 22px rgba(200,16,46,0.20); }
   .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
   .btn-primary:disabled { background: #bfdbfe; color: #eff6ff; cursor: not-allowed; box-shadow: none; }
   .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(15,23,42,0.06); }
@@ -1524,7 +1500,7 @@ const styles = `
   .success-banner .secret { margin-top: 14px; background: #fff; border: 1px dashed rgba(21,128,61,0.34); border-radius: 12px; padding: 12px 16px; font-family: monospace; font-size: 22px; letter-spacing: 0.15em; color: var(--success); font-weight: 900; }
   .success-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
   .success-small-note { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.45; }
-  .success-notice { display: inline-flex; justify-content: center; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(37, 99, 235, 0.09); color: var(--brand-dark); font-weight: 800; }
+  .success-notice { display: inline-flex; justify-content: center; align-items: center; padding: 8px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-weight: 800; }
 
   /* ADMIN */
   .admin-login-box { max-width: 420px; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 30px; margin: 60px auto; text-align: center; box-shadow: var(--shadow-sm); }
@@ -1564,7 +1540,7 @@ const styles = `
   .footer { margin-top: auto; background: #fff; border-top: 1px solid var(--line); padding: 30px 24px; text-align: center; }
   .footer-disclaimer { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 760px; margin: 0 auto; }
   .footer-disclaimer a { color: var(--primary); text-decoration: underline; }
-  .footer-divider { width: 54px; height: 4px; background: linear-gradient(90deg, var(--primary), #60a5fa); border-radius: 999px; margin: 0 auto 18px; }
+  .footer-divider { width: 54px; height: 4px; background: linear-gradient(90deg, var(--primary), #fb7185); border-radius: 999px; margin: 0 auto 18px; }
 
   @media (max-width: 980px) {
     .hero-inner { grid-template-columns: 1fr; padding: 42px 24px 34px; gap: 18px; }
@@ -1697,16 +1673,15 @@ function UniformCard({ item, onClick }) {
           <div className="card-price">{formatPrice(item.price)}</div>
         </div>
         <div className="card-tags">
-          {item.equipmentType && <span className="tag" style={{ background: "rgba(6,72,168,0.12)", color: "#0648a8" }}>{item.equipmentType}</span>}
+          {item.equipmentType && <span className="tag" style={{ background: "rgba(200,16,46,0.12)", color: "#c8102e" }}>{item.equipmentType}</span>}
           {item.size && <span className="tag">{item.size}</span>}
           {item.color && <span className="tag">{item.color}</span>}
           {item.condition && <span className={`tag ${conditionClass(item.condition)}`}>{item.condition}</span>}
         </div>
         {item.description && <div className="card-desc">{item.description}</div>}
-        {listedDate && <div className="card-listed">Listed {listedDate}</div>}
-        <div className="card-seller-box">
-          <span className="card-seller-label">Seller</span>
-          <strong>{item.contactName || "Seller"}</strong>
+        <div className="card-footer-row">
+          {listedDate ? <span>Listed {listedDate}</span> : <span>Recently listed</span>}
+          <span className="card-footer-cta">Open listing →</span>
         </div>
       </div>
     </article>
@@ -1856,7 +1831,7 @@ function EditForm({ item, onSave, onCancel }) {
       </div>
 
       <div style={{ paddingTop: 4, marginBottom: 4 }}>
-        <div className="form-label" style={{ fontSize: 13, color: "#0648a8", marginBottom: 12 }}>Contact Details</div>
+        <div className="form-label" style={{ fontSize: 13, color: "#c8102e", marginBottom: 12 }}>Contact Details</div>
       </div>
 
       <div className="contact-note">You can provide phone/WhatsApp, email, or both. At least one contact method is required so buyers can reach you.</div>
@@ -2043,7 +2018,7 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
                 onClick={() => setImgIdx(i)}
                 style={{
                   width: 8, height: 8, borderRadius: "50%", border: "none",
-                  background: i === imgIdx ? "#0648a8" : "rgba(6,72,168,0.18)",
+                  background: i === imgIdx ? "#c8102e" : "rgba(200,16,46,0.18)",
                   cursor: "pointer", padding: 0
                 }}
               />
@@ -2054,7 +2029,7 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
           <div className="modal-title">{currentItem.title}</div>
           <div className="modal-price">{formatPrice(currentItem.price)}</div>
           <div className="modal-tags">
-            {currentItem.equipmentType && <span className="tag" style={{ background: "rgba(6,72,168,0.12)", color: "#0648a8" }}>{currentItem.equipmentType}</span>}
+            {currentItem.equipmentType && <span className="tag" style={{ background: "rgba(200,16,46,0.12)", color: "#c8102e" }}>{currentItem.equipmentType}</span>}
             {currentItem.size && <span className="tag">{currentItem.size}</span>}
             {currentItem.color && <span className="tag">{currentItem.color}</span>}
             {currentItem.condition && <span className={`tag ${conditionClass(currentItem.condition)}`}>{currentItem.condition}</span>}
@@ -2176,8 +2151,15 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   const handleOpenEmailDraft = () => {
     if (!submitted?.contactEmail) return;
     const reminder = buildSellerCodeEmail(submitted);
-    setSuccessNotice("Opening your email app now. If nothing opens, use Copy code & instructions instead.");
-    window.location.href = reminder.mailto;
+    setSuccessNotice("Opening the email draft in a new tab or email app. This page should stay open so you can review your listing.");
+
+    const link = document.createElement("a");
+    link.href = reminder.mailto;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSubmit = async (event) => {
@@ -2228,7 +2210,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           {successNotice && <p className="success-small-note success-notice" role="status">{successNotice}</p>}
           <p className="success-small-note">Screenshot this code and keep it safe. Use it to edit your listing or mark it as sold. Please remove the listing if the item sells elsewhere.</p>
           {submitted.contactEmail ? (
-            <p className="success-small-note"><strong>Note:</strong> this opens a ready-made email on the seller's device. It cannot send automatically unless a backend email service is added.</p>
+            <p className="success-small-note"><strong>Note:</strong> this opens a ready-made email draft in a new tab or email app where supported. It cannot send automatically unless a backend email service is added.</p>
           ) : (
             <p className="success-small-note"><strong>No email was provided, so we cannot prepare an email reminder.</strong> Copy or screenshot the code before leaving this page.</p>
           )}
@@ -2334,7 +2316,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
       </div>
 
       <div style={{ paddingTop: 12, marginBottom: 4 }}>
-        <div className="form-label" style={{ fontSize: 14, color: "#0648a8", marginBottom: 14 }}>Your Contact Details</div>
+        <div className="form-label" style={{ fontSize: 14, color: "#c8102e", marginBottom: 14 }}>Your Contact Details</div>
       </div>
 
       <div className="contact-note">You can provide phone/WhatsApp, email, or both. At least one contact method is required so buyers can reach you.</div>
@@ -2564,7 +2546,7 @@ function AdminPage({ listings, onDelete, onLogout }) {
                   </td>
                   <td>{l.equipmentType || "—"}</td>
                   <td>{l.size || "—"}</td>
-                  <td style={{ color: "#0648a8", fontWeight: 700 }}>{formatPrice(l.price)}</td>
+                  <td style={{ color: "#c8102e", fontWeight: 700 }}>{formatPrice(l.price)}</td>
                   <td>{l.contactName}</td>
                   <td>
                     {l.contactPhone && <small>📱 {l.contactPhone}</small>}
@@ -2744,9 +2726,9 @@ export default function App() {
     { base: "#228B22", stripe: null },           // Green
     { base: "#228B22", stripe: "#1E3A8A" },      // Green with blue stripe
     { base: "#1E3A8A", stripe: null },           // Blue
-    { base: "#1E3A8A", stripe: "#0648a8" },      // Blue with red stripe
-    { base: "#0648a8", stripe: null },           // Red
-    { base: "#0648a8", stripe: "#1A1A1A" },      // Red with black stripe
+    { base: "#1E3A8A", stripe: "#c8102e" },      // Blue with red stripe
+    { base: "#c8102e", stripe: null },           // Red
+    { base: "#c8102e", stripe: "#1A1A1A" },      // Red with black stripe
     { base: "#1A1A1A", stripe: null },           // Black
   ];
 
@@ -2767,7 +2749,7 @@ export default function App() {
           <span style={{ fontSize: 26, lineHeight: 1 }}>🥋</span>
           <div>
             <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.2 }}>
-              PHOENIX <span style={{ color: "#0648a8" }}>TKD KIT</span>
+              PHOENIX <span style={{ color: "#c8102e" }}>TKD KIT</span>
             </div>
             <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#64748b", lineHeight: 1.2, textTransform: "uppercase" }}>
               Pre-loved kit marketplace
