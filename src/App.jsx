@@ -1896,6 +1896,245 @@ const styles = `
     .card { border-radius: 16px; }
   }
 
+  /* FINAL SPLIT THEME: dark image-led hero with light marketplace area */
+  .app {
+    background: #080c12;
+  }
+
+  .nav {
+    background: rgba(7, 11, 16, 0.92);
+    border-bottom-color: rgba(255,255,255,0.10);
+  }
+  .nav-logo {
+    color: #f8fafc;
+    font-weight: 700;
+  }
+  .nav-logo div div:first-child {
+    font-weight: 700 !important;
+    letter-spacing: 0.045em !important;
+  }
+
+  .hero {
+    min-height: 560px;
+    background: #080c12;
+    border-bottom: none;
+  }
+  .hero::before {
+    background:
+      radial-gradient(circle at 72% 22%, rgba(237,27,47,0.18), transparent 28rem),
+      linear-gradient(180deg, rgba(7,11,16,0.18), rgba(7,11,16,0.70));
+    z-index: 1;
+  }
+  .hero-inner {
+    max-width: none;
+    min-height: 560px;
+    grid-template-columns: 1fr;
+    align-items: center;
+    overflow: hidden;
+    padding: 72px clamp(24px, 5.5vw, 86px) 66px;
+  }
+  .hero-inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg,
+        rgba(7,11,16,0.99) 0%,
+        rgba(7,11,16,0.92) 30%,
+        rgba(7,11,16,0.54) 52%,
+        rgba(7,11,16,0.13) 74%,
+        rgba(7,11,16,0.02) 100%),
+      linear-gradient(180deg, rgba(7,11,16,0.14), rgba(7,11,16,0.54));
+  }
+  .hero-copy {
+    max-width: 610px;
+    z-index: 2;
+  }
+  .hero h1 {
+    color: #fff;
+    font-weight: 650;
+    letter-spacing: -0.035em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+  .hero h1 span {
+    color: #ff1d32;
+    font-weight: 650;
+  }
+  .hero-sub {
+    color: #e4ebf3;
+    font-weight: 450;
+    max-width: 570px;
+  }
+  .hero-trust-row { color: #f8fafc; }
+  .hero-visual {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero-visual::after { display: none; }
+  .hero-kit-image {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+    object-position: center right;
+    filter: saturate(1.08) contrast(1.04) brightness(0.99);
+  }
+  .gear-stage { display: none; }
+
+  .store-section {
+    max-width: none !important;
+    width: 100%;
+    margin: 0;
+    padding: 34px clamp(18px, 4vw, 58px) 76px;
+    background:
+      linear-gradient(180deg, #fff7f8 0%, #fff1f3 46%, #fff9fa 100%);
+    color: #221116;
+  }
+  .store-header,
+  .store-note,
+  .search-bar-wrap,
+  .search-results-info,
+  .grid,
+  .empty-state {
+    max-width: 1500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .store-header {
+    background: rgba(255,255,255,0.94) !important;
+    border: 1px solid rgba(200,16,46,0.13);
+    color: #221116;
+    box-shadow: 0 18px 42px rgba(126,17,32,0.10);
+  }
+  .store-title,
+  .store-title::before,
+  .store-controls,
+  .sort-control {
+    color: #221116 !important;
+  }
+  .filter-btn,
+  .reset-controls-btn,
+  .sort-select,
+  .search-bar {
+    background-color: #fff !important;
+    border-color: rgba(200,16,46,0.16) !important;
+    color: #221116 !important;
+    box-shadow: 0 8px 20px rgba(126,17,32,0.07) !important;
+  }
+  .filter-btn:hover,
+  .filter-btn.active,
+  .reset-controls-btn:hover:not(:disabled) {
+    background: #c8102e !important;
+    border-color: #c8102e !important;
+    color: #fff !important;
+  }
+  .reset-controls-btn:disabled {
+    background: rgba(255,255,255,0.72) !important;
+    color: rgba(34,17,22,0.48) !important;
+    border-color: rgba(34,17,22,0.10) !important;
+    box-shadow: none !important;
+  }
+  .sort-select option { background: #fff; color: #221116; }
+  .search-bar::placeholder { color: rgba(34,17,22,0.46) !important; }
+  .search-clear {
+    background: rgba(200,16,46,0.08) !important;
+    border-color: rgba(200,16,46,0.16) !important;
+    color: #8f1021 !important;
+  }
+  .store-note {
+    background: rgba(255,255,255,0.74) !important;
+    border-color: rgba(200,16,46,0.14) !important;
+    color: #5d2430 !important;
+  }
+  .store-note strong,
+  .search-results-info strong { color: #c8102e !important; }
+  .search-results-info { color: #6b4b52 !important; }
+
+  .grid { gap: 24px; }
+  .card {
+    background: linear-gradient(180deg, #fff1f3 0%, #ffe2e7 100%) !important;
+    border: 1px solid rgba(200,16,46,0.16) !important;
+    color: #2a1117 !important;
+    box-shadow: 0 18px 42px rgba(126,17,32,0.12) !important;
+  }
+  .card:hover {
+    border-color: rgba(200,16,46,0.30) !important;
+    box-shadow: 0 26px 58px rgba(126,17,32,0.18) !important;
+  }
+  .card::before {
+    background: linear-gradient(145deg, rgba(255,255,255,0.46), transparent 44%) !important;
+  }
+  .card-img {
+    background:
+      radial-gradient(circle at 22% 4%, rgba(255,255,255,0.80), transparent 34%),
+      linear-gradient(135deg, #ffd9df 0%, #fff6f7 48%, #f6b9c4 100%) !important;
+    border-bottom: 1px solid rgba(200,16,46,0.12) !important;
+  }
+  .card-img img { filter: drop-shadow(0 14px 18px rgba(126,17,32,0.13)) !important; }
+  .card-name { color: #2a1117 !important; }
+  .card-price { color: #c8102e !important; text-shadow: none !important; }
+  .card-desc { color: rgba(42,17,23,0.72) !important; }
+  .card .tag,
+  .card .tag[style] {
+    background: rgba(255,255,255,0.72) !important;
+    border-color: rgba(200,16,46,0.15) !important;
+    color: #6c1f2b !important;
+  }
+  .card-footer-row {
+    background: rgba(255,255,255,0.66) !important;
+    border-color: rgba(200,16,46,0.15) !important;
+    color: #43131d !important;
+  }
+  .card-footer-cta { color: #c8102e !important; }
+  .card-photo-nav,
+  .modal-photo-nav {
+    background: rgba(255,255,255,0.94) !important;
+    color: #141a22 !important;
+    border-color: rgba(15,23,42,0.12) !important;
+  }
+  .card-photo-nav:hover,
+  .card-photo-nav:focus-visible,
+  .modal-photo-nav:hover,
+  .modal-photo-nav:focus-visible {
+    background: #c8102e !important;
+    color: #fff !important;
+    border-color: #c8102e !important;
+  }
+  .card-photo-count,
+  .modal-photo-count { background: rgba(15,23,42,0.72) !important; }
+  .empty-state { color: #5d2430 !important; }
+
+  @media (max-width: 980px) {
+    .hero { min-height: 620px; }
+    .hero-inner { min-height: 620px; padding: 44px 24px 38px; align-items: end; }
+    .hero-inner::before {
+      background:
+        linear-gradient(180deg, rgba(7,11,16,0.18) 0%, rgba(7,11,16,0.48) 36%, rgba(7,11,16,0.96) 100%),
+        linear-gradient(90deg, rgba(7,11,16,0.70), rgba(7,11,16,0.10));
+    }
+    .hero-copy { max-width: 640px; }
+    .hero-kit-image { object-position: 63% center; }
+  }
+  @media (max-width: 680px) {
+    .hero { min-height: 560px; }
+    .hero-inner { min-height: 560px; padding: 32px 18px 30px; }
+    .hero h1 { font-size: 42px; line-height: 1.02; }
+    .hero-sub { font-size: 16px; }
+    .store-section { padding: 24px 16px 58px; }
+    .store-header { background: rgba(255,255,255,0.95) !important; }
+  }
+
+
 `;
 
 
@@ -2525,7 +2764,13 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           <div className="secret">{submitted.secretCode}</div>
           <div className="success-actions">
             {submitted.contactEmail && (
-              <button className="btn btn-ghost btn-sm" type="button" onClick={handleOpenEmailDraft}>✉️ Open email draft</button>
+              <a
+                className="btn btn-ghost btn-sm"
+                href={buildSellerCodeEmail(submitted).mailto}
+                onClick={() => setSuccessNotice("Opening your default email app. If nothing opens, use Copy code & instructions instead.")}
+              >
+                ✉️ Open email draft
+              </a>
             )}
             <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyReminder}>📋 Copy code & instructions</button>
           </div>
@@ -3171,7 +3416,7 @@ export default function App() {
                   disabled={!hasActiveListingControls}
                   aria-label="Reset search, filters and sort order"
                 >
-                  ↻ Reset
+                  ↻ Reset filters
                 </button>
               </div>
             </div>
@@ -3209,7 +3454,7 @@ export default function App() {
               ) : filtered.length === 0 ? (
                 <div className="empty-state">
                   <div className="icon">🥋</div>
-                  <p style={{ color: "#c9d2df", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
+                  <p style={{ color: "#451018", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
                     {hasActiveListingControls ? "No matching listings" : "No listings yet"}
                   </p>
                   <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
