@@ -1600,6 +1600,302 @@ const styles = `
     .modal-img { min-height: 250px; height: 48vh; border-radius: 18px 18px 0 0; }
     .modal-body { padding: 20px; }
   }
+
+  /* DARK PHOENIX VISUAL SYSTEM OVERRIDES
+     Matches the darker red/black hero mockup while preserving the app logic. */
+  :root {
+    --ink: #f8fafc;
+    --ink-soft: #e2e8f0;
+    --muted: #b8c2cf;
+    --faint: #7f8b99;
+    --line: rgba(255,255,255,0.13);
+    --surface: #111822;
+    --surface-soft: #171f2a;
+    --surface-blue: rgba(237,27,47,0.13);
+    --primary: #ed1b2f;
+    --primary-dark: #b40f24;
+    --primary-soft: rgba(237,27,47,0.16);
+    --primary-line: rgba(237,27,47,0.34);
+    --danger: #fb7185;
+    --success: #3ddc84;
+    --warning: #fbbf24;
+    --shadow-sm: 0 16px 36px rgba(0,0,0,0.28);
+    --shadow-md: 0 24px 70px rgba(0,0,0,0.34);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 18% -8%, rgba(237,27,47,0.18), transparent 34rem),
+      radial-gradient(circle at 92% 8%, rgba(255,255,255,0.06), transparent 26rem),
+      linear-gradient(180deg, #070b10 0%, #0d131b 46%, #101722 100%);
+    color: var(--ink);
+  }
+  .app {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.02), transparent 28rem),
+      radial-gradient(circle at 10% 62%, rgba(237,27,47,0.10), transparent 32rem);
+  }
+
+  .nav {
+    background: rgba(7,11,16,0.86);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 10px 34px rgba(0,0,0,0.28);
+  }
+  .nav-logo { color: #fff; }
+  .nav-logo > span {
+    background: linear-gradient(135deg, #ff1f35, #9f0e1e);
+    box-shadow: 0 12px 26px rgba(237,27,47,0.32);
+  }
+  .nav-tab { color: #c9d2df; }
+  .nav-tab:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-tab.active { background: var(--primary); color: #fff; box-shadow: 0 10px 24px rgba(237,27,47,0.30); }
+  .badge { background: var(--primary); color: #fff; }
+
+  .hero {
+    background:
+      linear-gradient(90deg, #05070a 0%, #090d12 42%, #17120f 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,0.04);
+  }
+  .hero::before {
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.42) 35%, rgba(0,0,0,0.05) 72%, transparent 100%),
+      radial-gradient(circle at 35% 42%, rgba(237,27,47,0.12), transparent 34rem);
+  }
+  .hero-inner {
+    max-width: 1500px;
+    min-height: 520px;
+    padding: 54px 54px 46px;
+    grid-template-columns: minmax(330px, 0.78fr) minmax(560px, 1.22fr);
+  }
+  .hero-kicker { display: none; }
+  .hero h1 {
+    color: #fff;
+    letter-spacing: -0.058em;
+    text-shadow: 0 3px 22px rgba(0,0,0,0.22);
+  }
+  .hero h1 span { color: #ff1e33; }
+  .hero-sub { color: #dce5ee; max-width: 570px; }
+  .hero-trust-row { color: #edf2f7; }
+  .hero-actions .btn-primary {
+    background: linear-gradient(135deg, #ff2037, #d91529);
+    color: #fff;
+    box-shadow: 0 18px 34px rgba(237,27,47,0.36);
+  }
+  .hero-actions .btn-primary:hover { background: linear-gradient(135deg, #ff3045, #b40f24); }
+  .hero-actions .btn-ghost {
+    background: rgba(255,255,255,0.96);
+    border-color: rgba(255,255,255,0.72);
+    color: #111827;
+  }
+  .hero-actions .btn-ghost:hover { background: #fff; color: var(--primary); }
+  .hero-visual {
+    min-height: 430px;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  .hero-visual::after { display: none; }
+  .hero-kit-image {
+    inset: -4% -2% -3% -4%;
+    width: 108%;
+    height: 108%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(1.12) contrast(1.07) brightness(0.98);
+    border-radius: 0;
+  }
+  .gear-stage { display: none; }
+
+  .store-section { max-width: 1500px; padding: 28px 54px 70px; }
+  .store-header {
+    background: rgba(17,24,35,0.86);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 18px 46px rgba(0,0,0,0.24);
+  }
+  .store-title { color: #fff; }
+  .store-title::before { color: #fff; }
+  .store-controls { color: #fff; }
+  .filter-btn,
+  .reset-controls-btn,
+  .sort-select,
+  .search-bar,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    background-color: rgba(10,15,22,0.76);
+    border-color: rgba(255,255,255,0.14);
+    color: #f8fafc;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 22px rgba(0,0,0,0.16);
+  }
+  .filter-btn { color: #d5dde8; }
+  .filter-btn:hover { background: rgba(237,27,47,0.16); color: #fff; border-color: rgba(237,27,47,0.50); }
+  .filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .reset-controls-btn { color: #fff; }
+  .reset-controls-btn:disabled { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.42); border-color: rgba(255,255,255,0.09); }
+  .sort-control { color: #fff; }
+  .sort-select option,
+  .form-select option,
+  .form-select optgroup { background: #101722; color: #f8fafc; }
+  .search-bar::placeholder,
+  .form-input::placeholder,
+  .form-textarea::placeholder { color: rgba(226,232,240,0.55); }
+  .search-clear { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); color: #fff; }
+  .store-note {
+    background: rgba(17,24,35,0.64);
+    border-color: rgba(237,27,47,0.24);
+    color: #d7e0eb;
+  }
+  .store-note strong,
+  .search-results-info strong { color: #ff3a4c; }
+  .search-results-info { color: #b8c2cf; }
+
+  .grid { gap: 26px; }
+  .card {
+    background: linear-gradient(180deg, #9f1726 0%, #841522 47%, #70131d 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 20px 42px rgba(0,0,0,0.24), 0 10px 26px rgba(237,27,47,0.10);
+    color: #fff;
+  }
+  .card:hover {
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 28px 60px rgba(0,0,0,0.30), 0 15px 34px rgba(237,27,47,0.18);
+  }
+  .card::before { background: linear-gradient(145deg, rgba(255,255,255,0.09), transparent 40%); }
+  .card-img {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255,255,255,0.20), transparent 36%),
+      linear-gradient(135deg, #bb2431 0%, #921923 52%, #76121d 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  .card-img img { filter: drop-shadow(0 15px 18px rgba(0,0,0,0.20)); }
+  .card-name,
+  .card-price { color: #fff; }
+  .card-price { text-shadow: 0 1px 6px rgba(0,0,0,0.20); }
+  .card-desc { color: rgba(255,255,255,0.78); }
+  .card .tag,
+  .card .tag[style] {
+    background: rgba(255,255,255,0.11) !important;
+    border-color: rgba(255,255,255,0.16) !important;
+    color: rgba(255,255,255,0.92) !important;
+  }
+  .card-footer-row {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.92);
+  }
+  .card-footer-cta { color: #fff; }
+  .card-photo-nav,
+  .modal-photo-nav {
+    background: rgba(255,255,255,0.94);
+    color: #111827;
+    border-color: rgba(255,255,255,0.28);
+  }
+  .card-photo-count,
+  .modal-photo-count { background: rgba(0,0,0,0.62); }
+
+  .empty-state { color: #b8c2cf; }
+
+  .modal,
+  .form-section,
+  .tc-section,
+  .admin-section,
+  .admin-login-box {
+    background: rgba(14,20,29,0.94);
+    border-color: rgba(255,255,255,0.12);
+    color: #f8fafc;
+    box-shadow: 0 32px 90px rgba(0,0,0,0.40);
+  }
+  .modal-close,
+  .btn-ghost {
+    background: rgba(255,255,255,0.94);
+    color: #111827;
+    border-color: rgba(255,255,255,0.24);
+  }
+  .btn-ghost:hover { background: #fff; color: var(--primary); }
+  .modal-img,
+  .upload-area,
+  .preview-thumb {
+    background: linear-gradient(135deg, rgba(237,27,47,0.14), rgba(255,255,255,0.04));
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.64);
+  }
+  .modal-title,
+  .form-title,
+  .admin-title,
+  .tc-title,
+  .edit-modal-title,
+  .tc-clause-title,
+  .admin-login-box h2 { color: #fff; }
+  .modal-desc,
+  .sold-section p,
+  .checkbox-group label,
+  .tc-clause p,
+  .form-sub,
+  .admin-sub,
+  .tc-subtitle,
+  .edit-modal-sub,
+  .form-hint,
+  .field-note,
+  .upload-text,
+  .success-banner p,
+  .success-small-note,
+  .admin-login-box p { color: #b8c2cf; }
+  .modal-section,
+  .tc-clause,
+  .contact-chip,
+  .sold-section,
+  .owner-actions,
+  .checkbox-group,
+  .secret-box,
+  .contact-note,
+  .tc-contact-box,
+  .success-banner,
+  .admin-stat,
+  .admin-table,
+  .admin-table th,
+  .admin-table td {
+    background: rgba(255,255,255,0.045);
+    border-color: rgba(255,255,255,0.11);
+  }
+  .contact-chip,
+  .tc-contact-box,
+  .admin-table td { color: #e2e8f0; }
+  .admin-table th { color: #c9d2df; background: rgba(255,255,255,0.07); }
+  .admin-table tr:hover td { background: rgba(237,27,47,0.07); }
+  .success-banner { background: rgba(61,220,132,0.08); border-color: rgba(61,220,132,0.24); }
+  .success-banner .secret { background: rgba(0,0,0,0.22); color: #7cf5ad; border-color: rgba(61,220,132,0.34); }
+  .success-notice { background: rgba(237,27,47,0.16); color: #ffd9de; }
+  .secret-box p,
+  .contact-note { color: #ffd9de; }
+  .form-label { color: #c9d2df; }
+  .form-label .req { color: #ff6374; }
+  .footer {
+    background: rgba(7,11,16,0.92);
+    border-top-color: rgba(255,255,255,0.10);
+  }
+  .footer-disclaimer { color: #b8c2cf; }
+
+  @media (max-width: 980px) {
+    .hero-inner {
+      min-height: auto;
+      grid-template-columns: 1fr;
+      padding: 42px 24px 36px;
+    }
+    .hero::before { background: linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0.20)); }
+    .hero-visual { min-height: 340px; }
+    .store-section { padding: 24px 20px 60px; }
+  }
+  @media (max-width: 680px) {
+    .hero-inner { padding: 34px 18px 28px; }
+    .hero-visual { min-height: 250px; }
+    .hero-kit-image { inset: 0; width: 100%; height: 100%; object-position: center; }
+    .store-header { background: rgba(17,24,35,0.92); }
+    .store-controls { align-items: stretch; }
+    .reset-controls-btn { width: 100%; justify-content: center; }
+    .card { border-radius: 16px; }
+  }
+
 `;
 
 
@@ -2181,15 +2477,11 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
 
     setSuccessNotice("Trying to open your default email app. If nothing opens, use Copy code & instructions and paste it into your email or notes app.");
 
-    // Do not open mailto: in a new browser tab; some browsers show a blank tab.
-    // A normal same-tab mailto click gives the operating system/browser the best
-    // chance to trigger the user's default email app or email-app chooser.
-    const link = document.createElement("a");
-    link.href = reminder.mailto;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Use the browser's normal mailto handler rather than opening a new tab.
+    // This gives macOS/Windows/iOS/Android the best chance to launch the user's
+    // default mail app or configured webmail handler. If the user has no handler,
+    // their browser may still do nothing, so the copy buttons remain as fallback.
+    window.location.href = reminder.mailto;
   };
 
   const handleSubmit = async (event) => {
@@ -2787,7 +3079,7 @@ export default function App() {
             <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.2 }}>
               PHOENIX <span style={{ color: "#c8102e" }}>TKD KIT</span>
             </div>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#64748b", lineHeight: 1.2, textTransform: "uppercase" }}>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#c9d2df", lineHeight: 1.2, textTransform: "uppercase" }}>
               Pre-loved kit marketplace
             </div>
           </div>
@@ -2917,7 +3209,7 @@ export default function App() {
               ) : filtered.length === 0 ? (
                 <div className="empty-state">
                   <div className="icon">🥋</div>
-                  <p style={{ color: "#64748b", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
+                  <p style={{ color: "#c9d2df", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
                     {hasActiveListingControls ? "No matching listings" : "No listings yet"}
                   </p>
                   <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
