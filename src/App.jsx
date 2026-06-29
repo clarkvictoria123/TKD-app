@@ -1126,8 +1126,8 @@ const styles = `
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--surface-soft);
-    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.68);
+    border: 1px solid rgba(200,16,46,0.14);
     color: var(--muted);
     width: 28px;
     height: 28px;
@@ -1148,12 +1148,12 @@ const styles = `
   .card {
     width: 100%;
     position: relative;
-    background: #fff;
-    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #fff7f8 0%, #fde7ec 100%);
+    border: 1px solid rgba(200,16,46,0.18);
     border-radius: 18px;
     overflow: hidden;
     transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+    box-shadow: 0 12px 28px rgba(143,16,33,0.12);
     cursor: pointer;
     color: inherit;
     font: inherit;
@@ -1161,41 +1161,32 @@ const styles = `
     padding: 0;
     appearance: none;
   }
-  .card:hover { transform: translateY(-5px); border-color: var(--primary-line); box-shadow: 0 22px 46px rgba(15,23,42,0.14); }
-  .card:focus-visible { outline: 4px solid rgba(200,16,46,0.18); outline-offset: 3px; }
-  .card::before { content: none; }
+  .card:hover { transform: translateY(-5px); border-color: rgba(200,16,46,0.40); box-shadow: 0 24px 50px rgba(143,16,33,0.20); }
+  .card:focus-visible { outline: 4px solid rgba(200,16,46,0.20); outline-offset: 3px; }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(200,16,46,0.08), transparent 42%);
+  }
   .card-img {
     width: 100%;
     height: 220px;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0)),
-      linear-gradient(0deg, #eadfce 0%, #f8f4ec 100%);
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.55), transparent 34%),
+      linear-gradient(135deg, #f8d2da 0%, #fff4f6 48%, #f2b9c7 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #cbd5e1;
+    color: rgba(143,16,33,0.34);
     font-size: 48px;
     font-weight: 900;
     position: relative;
     padding: 12px;
+    border-bottom: 1px solid rgba(200,16,46,0.13);
   }
   .card-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 12px; }
-  .card-view-pill {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 2;
-    background: #fff;
-    border: 1px solid rgba(15,23,42,0.10);
-    color: var(--ink);
-    border-radius: 12px;
-    padding: 8px 11px;
-    font-size: 13px;
-    font-weight: 900;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.12);
-    pointer-events: none;
-  }
-  .card-view-pill::before { content: "👁 "; font-size: 12px; }
   .card-photo-count,
   .modal-photo-count {
     position: absolute;
@@ -1245,7 +1236,7 @@ const styles = `
     border-color: var(--primary);
     outline: none;
   }
-  .card-body { padding: 16px; }
+  .card-body { padding: 16px; position: relative; z-index: 1; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
   .card-name { font-weight: 900; font-size: 19px; line-height: 1.18; color: var(--ink); }
   .card-price { color: var(--ink); font-size: 25px; font-weight: 900; white-space: nowrap; }
@@ -1275,15 +1266,17 @@ const styles = `
   }
   .card-footer-row {
     margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid var(--line);
+    padding: 11px 12px;
+    border: 1px solid rgba(200,16,46,0.16);
+    border-radius: 13px;
+    background: rgba(255,255,255,0.72);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    color: var(--faint);
+    color: var(--muted);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
   }
   .card-footer-cta {
     color: var(--primary);
@@ -1641,7 +1634,6 @@ function UniformCard({ item, onClick }) {
       aria-label={`View ${item.title}`}
     >
       <div className="card-img">
-        <span className="card-view-pill">View →</span>
         {imageCount > 0 ? (
           <img src={images[cardImgIdx]} alt={`${item.title} photo ${cardImgIdx + 1}`} />
         ) : "🥋"}
