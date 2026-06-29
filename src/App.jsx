@@ -1044,6 +1044,36 @@ const styles = `
   }
   .filter-btn:hover { color: var(--primary); border-color: var(--primary-line); background: var(--primary-soft); }
   .filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .reset-controls-btn {
+    background: #fff;
+    border: 1px solid var(--primary-line);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 10px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 4px 10px rgba(15,23,42,0.04);
+    transition: all 0.16s ease;
+  }
+  .reset-controls-btn:hover:not(:disabled),
+  .reset-controls-btn:focus-visible {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    outline: none;
+  }
+  .reset-controls-btn:disabled {
+    opacity: 0.46;
+    cursor: not-allowed;
+    color: var(--muted);
+    border-color: var(--line);
+    box-shadow: none;
+  }
   .store-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
   .sort-control {
     display: inline-flex;
@@ -1148,12 +1178,12 @@ const styles = `
   .card {
     width: 100%;
     position: relative;
-    background: linear-gradient(180deg, #fff7f8 0%, #fde7ec 100%);
-    border: 1px solid rgba(200,16,46,0.18);
+    background: linear-gradient(180deg, #fffafa 0%, #fff1f3 100%);
+    border: 1px solid rgba(200,16,46,0.12);
     border-radius: 18px;
     overflow: hidden;
     transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    box-shadow: 0 12px 28px rgba(143,16,33,0.12);
+    box-shadow: 0 12px 28px rgba(143,16,33,0.08);
     cursor: pointer;
     color: inherit;
     font: inherit;
@@ -1161,21 +1191,21 @@ const styles = `
     padding: 0;
     appearance: none;
   }
-  .card:hover { transform: translateY(-5px); border-color: rgba(200,16,46,0.40); box-shadow: 0 24px 50px rgba(143,16,33,0.20); }
+  .card:hover { transform: translateY(-5px); border-color: rgba(200,16,46,0.28); box-shadow: 0 24px 50px rgba(143,16,33,0.14); }
   .card:focus-visible { outline: 4px solid rgba(200,16,46,0.20); outline-offset: 3px; }
   .card::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(135deg, rgba(200,16,46,0.08), transparent 42%);
+    background: linear-gradient(135deg, rgba(200,16,46,0.035), transparent 42%);
   }
   .card-img {
     width: 100%;
     height: 220px;
     background:
-      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.55), transparent 34%),
-      linear-gradient(135deg, #f8d2da 0%, #fff4f6 48%, #f2b9c7 100%);
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.78), transparent 34%),
+      linear-gradient(135deg, #fde8ec 0%, #fff8f9 48%, #f7d2da 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1184,7 +1214,7 @@ const styles = `
     font-weight: 900;
     position: relative;
     padding: 12px;
-    border-bottom: 1px solid rgba(200,16,46,0.13);
+    border-bottom: 1px solid rgba(200,16,46,0.10);
   }
   .card-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 12px; }
   .card-photo-count,
@@ -1269,7 +1299,7 @@ const styles = `
     padding: 11px 12px;
     border: 1px solid rgba(200,16,46,0.16);
     border-radius: 13px;
-    background: rgba(255,255,255,0.72);
+    background: rgba(255,255,255,0.82);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1631,7 +1661,7 @@ function UniformCard({ item, onClick }) {
       tabIndex={0}
       onClick={openListing}
       onKeyDown={handleCardKeyDown}
-      aria-label={`View ${item.title}`}
+      aria-label={`Open listing for ${item.title}`}
     >
       <div className="card-img">
         {imageCount > 0 ? (
@@ -2143,12 +2173,20 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   const handleOpenEmailDraft = () => {
     if (!submitted?.contactEmail) return;
     const reminder = buildSellerCodeEmail(submitted);
-    setSuccessNotice("Opening the email draft in a new tab or email app. This page should stay open so you can review your listing.");
 
+    if (!reminder.mailto) {
+      setSuccessNotice("No email address is available for this listing. Copy the reminder text instead.");
+      return;
+    }
+
+    setSuccessNotice("Trying to open your default email app. If nothing opens, use Copy code & instructions and paste it into your email or notes app.");
+
+    // Do not open mailto: in a new browser tab; some browsers show a blank tab.
+    // A normal same-tab mailto click gives the operating system/browser the best
+    // chance to trigger the user's default email app or email-app chooser.
     const link = document.createElement("a");
     link.href = reminder.mailto;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
+    link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2202,7 +2240,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           {successNotice && <p className="success-small-note success-notice" role="status">{successNotice}</p>}
           <p className="success-small-note">Screenshot this code and keep it safe. Use it to edit your listing or mark it as sold. Please remove the listing if the item sells elsewhere.</p>
           {submitted.contactEmail ? (
-            <p className="success-small-note"><strong>Note:</strong> this opens a ready-made email draft in a new tab or email app where supported. It cannot send automatically unless a backend email service is added.</p>
+            <p className="success-small-note"><strong>Note:</strong> this asks your device to open its default email app with a ready-made draft. If nothing opens, use Copy code & instructions instead.</p>
           ) : (
             <p className="success-small-note"><strong>No email was provided, so we cannot prepare an email reminder.</strong> Copy or screenshot the code before leaving this page.</p>
           )}
@@ -2709,6 +2747,12 @@ export default function App() {
     return true;
   });
   const sortedListings = sortListings(filtered, sortOrder);
+  const hasActiveListingControls = Boolean(search.trim()) || sizeFilter !== "All" || sortOrder !== "newest";
+  const resetListingControls = () => {
+    setSearch("");
+    setSizeFilter("All");
+    setSortOrder("newest");
+  };
 
   const beltColors = [
     { base: "#FFFFFF", stripe: null },           // White
@@ -2828,6 +2872,15 @@ export default function App() {
                     ))}
                   </select>
                 </label>
+                <button
+                  className="reset-controls-btn"
+                  type="button"
+                  onClick={resetListingControls}
+                  disabled={!hasActiveListingControls}
+                  aria-label="Reset search, filters and sort order"
+                >
+                  ↻ Reset
+                </button>
               </div>
             </div>
 
@@ -2864,9 +2917,15 @@ export default function App() {
               ) : filtered.length === 0 ? (
                 <div className="empty-state">
                   <div className="icon">🥋</div>
-                  <p style={{ color: "#64748b", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>No listings yet</p>
-                  <div style={{ marginTop: 8 }}>
-                    <button className="btn btn-primary btn-sm" type="button" style={{ marginTop: 12 }} onClick={() => setTab("sell")}>Be the first to list one →</button>
+                  <p style={{ color: "#64748b", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
+                    {hasActiveListingControls ? "No matching listings" : "No listings yet"}
+                  </p>
+                  <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+                    {hasActiveListingControls ? (
+                      <button className="btn btn-ghost btn-sm" type="button" style={{ marginTop: 12 }} onClick={resetListingControls}>Clear search, filters and sort</button>
+                    ) : (
+                      <button className="btn btn-primary btn-sm" type="button" style={{ marginTop: 12 }} onClick={() => setTab("sell")}>Be the first to list one →</button>
+                    )}
                   </div>
                 </div>
               ) : (
