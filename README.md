@@ -1,9 +1,20 @@
-# TKD Uniform Store
+# TKD Uniform Store - Supabase Connected
 
-A React/Vite app for listing second-hand taekwondo uniforms and equipment.
+These are the files that must replace the files in the GitHub repo root.
 
-## Hosting settings
+Upload these visible files/folders to GitHub:
 
-- Framework: Vite
-- Build command: npm run build
-- Output directory: dist
+- index.html
+- package.json
+- README.md
+- .gitignore
+- src
+
+Do not upload this ZIP file itself.
+
+After committing, Vercel should redeploy. Make sure Vercel has these Environment Variables:
+
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
+
+Then redeploy the project in Vercel.

@@ -18,6 +18,11 @@ const ADMIN_SESSION_KEY = "tkd-admin-verified";
 // To enable this temporary client-side admin login, set this to the SHA-256 hex hash
 // of your chosen admin password. Do not put the plain password in this file.
 const ADMIN_PASSWORD_HASH = "";
+const ADMIN_PASSWORD_SESSION_KEY = "tkd-admin-password-session";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 const MAX_IMAGES = 5;
 const MAX_IMAGE_SIZE_BYTES = 6 * 1024 * 1024;
@@ -89,12 +94,140 @@ async function verifySellerCode(input, item) {
   const normalised = normaliseCode(input);
   if (!normalised) return false;
 
+  if (SUPABASE_ENABLED) {
+    return verifyRemoteSellerCode(item.id, normalised);
+  }
+
   if (item.secretCodeHash) {
     return (await sha256Hex(normalised)) === item.secretCodeHash;
   }
 
   // Legacy support for listings created before secret-code hashing was added.
   return normalised === normaliseCode(item.secretCode);
+}
+
+
+function getSupabaseUrl() {
+  return SUPABASE_URL.replace(/\/$/, "");
+}
+
+async function supabaseRpc(functionName, body = {}) {
+  if (!SUPABASE_ENABLED) {
+    throw new Error("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel.");
+  }
+
+  const response = await fetch(`${getSupabaseUrl()}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    let message = `Database request failed (${response.status})`;
+    try {
+      const error = await response.json();
+      message = error?.message || error?.details || message;
+    } catch {
+      const text = await response.text();
+      if (text) message = text;
+    }
+    throw new Error(message);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+function databaseRowToListing(row) {
+  return normaliseListing({
+    id: row.id,
+    title: row.title || "",
+    brand: row.brand || "",
+    equipmentType: row.equipment_type || "",
+    size: row.size || "",
+    color: row.color || "",
+    condition: row.condition || "",
+    price: Number(row.price) || 0,
+    description: row.description || "",
+    contactName: row.contact_name || "",
+    contactPhone: row.contact_phone || "",
+    contactEmail: row.contact_email || "",
+    images: Array.isArray(row.images) ? row.images : [],
+    listedAt: row.listed_at || row.created_at || new Date().toISOString(),
+  });
+}
+
+function listingToDatabasePayload(item) {
+  return {
+    title: item.title || "",
+    brand: item.brand || "",
+    equipmentType: item.equipmentType || "",
+    size: item.size || "",
+    color: item.color || "",
+    condition: item.condition || "",
+    price: Number(item.price) || 0,
+    description: item.description || "",
+    contactName: item.contactName || "",
+    contactPhone: item.contactPhone || "",
+    contactEmail: item.contactEmail || "",
+    images: Array.isArray(item.images) ? item.images : [],
+    listedAt: item.listedAt || new Date().toISOString(),
+  };
+}
+
+async function createRemoteListing(item) {
+  const rows = await supabaseRpc("create_listing", {
+    listing_data: listingToDatabasePayload(item),
+    seller_code_hash: item.secretCodeHash,
+  });
+
+  const row = Array.isArray(rows) ? rows[0] : rows;
+  if (!row) throw new Error("The database did not return the new listing.");
+  return databaseRowToListing(row);
+}
+
+async function updateRemoteListing(item, sellerCode) {
+  const rows = await supabaseRpc("update_listing", {
+    listing_id: item.id,
+    seller_code: normaliseCode(sellerCode),
+    listing_data: listingToDatabasePayload(item),
+  });
+
+  const row = Array.isArray(rows) ? rows[0] : rows;
+  if (!row) throw new Error("Incorrect seller code, or this listing no longer exists.");
+  return databaseRowToListing(row);
+}
+
+async function deleteRemoteListing(id, sellerCode) {
+  const deleted = await supabaseRpc("delete_listing", {
+    listing_id: id,
+    seller_code: normaliseCode(sellerCode),
+  });
+
+  if (!deleted) throw new Error("Incorrect seller code, or this listing no longer exists.");
+}
+
+async function adminDeleteRemoteListing(id) {
+  const adminPassword = window.sessionStorage?.getItem(ADMIN_PASSWORD_SESSION_KEY) || "";
+  if (!adminPassword) throw new Error("Admin session expired. Please log in again.");
+
+  const deleted = await supabaseRpc("admin_delete_listing", {
+    listing_id: id,
+    admin_password: adminPassword,
+  });
+
+  if (!deleted) throw new Error("Admin delete was rejected. Check the admin password hash in Supabase.");
+}
+
+async function verifyRemoteSellerCode(id, sellerCode) {
+  return Boolean(await supabaseRpc("verify_listing_code", {
+    listing_id: id,
+    seller_code: normaliseCode(sellerCode),
+  }));
 }
 
 function normaliseListing(listing) {
@@ -121,6 +254,11 @@ function parseListings(raw) {
 
 async function loadListings() {
   if (typeof window === "undefined") return [];
+
+  if (SUPABASE_ENABLED) {
+    const rows = await supabaseRpc("get_listings");
+    return Array.isArray(rows) ? rows.map(databaseRowToListing) : [];
+  }
 
   if (window.storage?.get) {
     const result = await window.storage.get(LISTINGS_STORAGE_KEY);
@@ -1265,7 +1403,7 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
     setCodeError("");
 
     try {
-      await onSold(currentItem.id);
+      await onSold(currentItem.id, code);
       onClose();
     } catch (error) {
       setCodeError(getStorageErrorMessage(error));
@@ -1274,8 +1412,8 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
   };
 
   const handleSave = async (updated) => {
-    await onEdit(updated);
-    setCurrentItem(updated);
+    const saved = await onEdit(updated, code);
+    setCurrentItem(saved || updated);
   };
 
   if (editMode) {
@@ -1866,21 +2004,50 @@ export default function App() {
   };
 
   const handleNewListing = async (item) => {
+    if (SUPABASE_ENABLED) {
+      const savedItem = await createRemoteListing(item);
+      setListings(current => [savedItem, ...current]);
+      setStorageError("");
+      return;
+    }
+
     const updated = [item, ...listings];
     await persistListings(updated);
   };
 
-  const handleSold = async (id) => {
+  const handleSold = async (id, sellerCode) => {
+    if (SUPABASE_ENABLED) {
+      await deleteRemoteListing(id, sellerCode);
+      setListings(current => current.filter(l => l.id !== id));
+      setStorageError("");
+      return;
+    }
+
     const updated = listings.filter(l => l.id !== id);
     await persistListings(updated);
   };
 
-  const handleEdit = async (updatedItem) => {
+  const handleEdit = async (updatedItem, sellerCode) => {
+    if (SUPABASE_ENABLED) {
+      const savedItem = await updateRemoteListing(updatedItem, sellerCode);
+      setListings(current => current.map(l => l.id === savedItem.id ? savedItem : l));
+      setStorageError("");
+      return savedItem;
+    }
+
     const updated = listings.map(l => l.id === updatedItem.id ? updatedItem : l);
     await persistListings(updated);
+    return updatedItem;
   };
 
   const handleAdminDelete = async (id) => {
+    if (SUPABASE_ENABLED) {
+      await adminDeleteRemoteListing(id);
+      setListings(current => current.filter(l => l.id !== id));
+      setStorageError("");
+      return;
+    }
+
     const updated = listings.filter(l => l.id !== id);
     await persistListings(updated);
   };
@@ -1905,8 +2072,9 @@ export default function App() {
       const result = await verifyAdminPassword(adminPassword);
       if (result.ok) {
         setAdminLoggedIn(true);
-        setAdminPassword("");
         window.sessionStorage?.setItem(ADMIN_SESSION_KEY, "true");
+        window.sessionStorage?.setItem(ADMIN_PASSWORD_SESSION_KEY, adminPassword.trim());
+        setAdminPassword("");
       } else {
         setAdminError(result.error || "Incorrect password.");
       }
@@ -2081,7 +2249,7 @@ export default function App() {
           <AdminPage
             listings={listings}
             onDelete={handleAdminDelete}
-            onLogout={() => { window.sessionStorage?.removeItem(ADMIN_SESSION_KEY); setAdminLoggedIn(false); setTab("store"); }}
+            onLogout={() => { window.sessionStorage?.removeItem(ADMIN_SESSION_KEY); window.sessionStorage?.removeItem(ADMIN_PASSWORD_SESSION_KEY); setAdminLoggedIn(false); setTab("store"); }}
           />
         ) : (
           <div className="admin-login-box">
