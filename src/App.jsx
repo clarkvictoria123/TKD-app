@@ -827,6 +827,7 @@ const styles = `
     position: absolute;
     right: 10px;
     bottom: 10px;
+    z-index: 3;
     background: rgba(6,15,26,0.84);
     border: 1px solid rgba(255,255,255,0.14);
     color: #fff;
@@ -836,6 +837,43 @@ const styles = `
     font-weight: 700;
     letter-spacing: 0.04em;
     backdrop-filter: blur(4px);
+  }
+  .card-photo-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 4;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(6,15,26,0.72);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 700;
+    cursor: pointer;
+    opacity: 0.92;
+    transform: translateY(-50%);
+    transition: opacity 0.16s, background 0.16s, border-color 0.16s, transform 0.16s;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    padding: 0 0 3px;
+  }
+  .card-photo-prev { left: 10px; }
+  .card-photo-next { right: 10px; }
+  .card:hover .card-photo-nav,
+  .card:focus-within .card-photo-nav {
+    opacity: 1;
+  }
+  .card-photo-nav:hover,
+  .card-photo-nav:focus-visible {
+    background: rgba(200,16,46,0.92);
+    border-color: rgba(255,255,255,0.30);
+    transform: translateY(-50%) scale(1.05);
+    outline: none;
   }
 
   .card-body { padding: 17px; }
@@ -955,10 +993,10 @@ const styles = `
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
+  .modal-close { z-index: 5; }
   .modal-close:hover { background: rgba(200,16,46,0.2); color: #fff; }
 
   .modal-img {
-    position: relative;
     width: 100%; min-height: 280px; height: min(64vh, 520px);
     background:
       radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 48%),
@@ -970,69 +1008,56 @@ const styles = `
     border-radius: 16px 16px 0 0;
     overflow: hidden;
     padding: 12px;
+    position: relative;
   }
   .modal-img img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
-  .modal-img-arrow {
+  .modal-photo-nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 4;
     width: 44px;
     height: 44px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(6,15,26,0.76);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(6,15,26,0.78);
     color: #fff;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 34px;
+    font-size: 30px;
+    font-weight: 800;
     line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 12px 26px rgba(0,0,0,0.30);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.28);
     transition: transform 0.15s, background 0.15s, border-color 0.15s;
   }
-  .modal-img-arrow:hover {
+  .modal-photo-nav:hover {
     background: rgba(200,16,46,0.92);
-    border-color: rgba(255,255,255,0.30);
-    transform: translateY(-50%) scale(1.04);
+    border-color: rgba(255,255,255,0.36);
   }
-  .modal-img-arrow:focus-visible { outline: 3px solid rgba(212,168,67,0.55); outline-offset: 3px; }
-  .modal-img-arrow-left { left: 14px; padding-bottom: 4px; }
-  .modal-img-arrow-right { right: 14px; padding-bottom: 4px; }
-  .modal-img-counter {
+  .modal-photo-nav:focus-visible { outline: 3px solid rgba(212,168,67,0.72); outline-offset: 3px; }
+  .modal-photo-prev { left: 14px; }
+  .modal-photo-next { right: 14px; }
+  .modal-photo-prev:hover { transform: translateY(-50%) translateX(-2px); }
+  .modal-photo-next:hover { transform: translateY(-50%) translateX(2px); }
+  .modal-photo-count {
     position: absolute;
     left: 50%;
     bottom: 14px;
     transform: translateX(-50%);
     z-index: 4;
-    background: rgba(6,15,26,0.78);
+    background: rgba(6,15,26,0.82);
     border: 1px solid rgba(255,255,255,0.14);
-    color: #F0EDE8;
+    color: #fff;
     border-radius: 999px;
     padding: 5px 10px;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.05em;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.26);
+    pointer-events: none;
+    backdrop-filter: blur(4px);
   }
-  .modal-dots {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    padding: 9px 0 0;
-    background: #111E2E;
-  }
-  .modal-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.2);
-    cursor: pointer;
-    padding: 0;
-  }
-  .modal-dot.active { background: #C8102E; }
 
   .modal-body { padding: 24px; }
   .modal-title {
@@ -1456,10 +1481,13 @@ const styles = `
     .sort-select { flex: 1; min-width: 0; }
     .card-img { height: 200px; }
     .card-view-pill { top: 8px; right: 8px; }
-    .modal-img-arrow { width: 38px; height: 38px; font-size: 30px; }
-    .modal-img-arrow-left { left: 10px; }
-    .modal-img-arrow-right { right: 10px; }
-    .modal-img-counter { bottom: 10px; }
+    .card-photo-nav { opacity: 0.96; width: 32px; height: 32px; font-size: 23px; }
+    .card-photo-prev { left: 8px; }
+    .card-photo-next { right: 8px; }
+    .modal-photo-nav { width: 38px; height: 38px; font-size: 26px; }
+    .modal-photo-prev { left: 10px; }
+    .modal-photo-next { right: 10px; }
+    .modal-photo-count { bottom: 10px; font-size: 11px; }
   }
 `;
 
@@ -1472,17 +1500,84 @@ function conditionClass(c) {
 }
 
 function UniformCard({ item, onClick }) {
-  const imageCount = Array.isArray(item.images) ? item.images.length : 0;
+  const images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+  const imageCount = images.length;
+  const [cardImgIdx, setCardImgIdx] = useState(0);
   const listedDate = formatDateShort(item.listedAt);
 
+  useEffect(() => {
+    setCardImgIdx(0);
+  }, [item.id, imageCount]);
+
+  const openListing = () => onClick(item);
+
+  const showPreviousCardPhoto = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setCardImgIdx((idx) => (idx - 1 + imageCount) % imageCount);
+  };
+
+  const showNextCardPhoto = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setCardImgIdx((idx) => (idx + 1) % imageCount);
+  };
+
+  const handleCardKeyDown = (event) => {
+    const tagName = event.target?.tagName;
+    if (["BUTTON", "A", "INPUT", "TEXTAREA", "SELECT"].includes(tagName)) return;
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openListing();
+      return;
+    }
+
+    if (imageCount > 1 && event.key === "ArrowLeft") {
+      showPreviousCardPhoto(event);
+      return;
+    }
+
+    if (imageCount > 1 && event.key === "ArrowRight") {
+      showNextCardPhoto(event);
+    }
+  };
+
   return (
-    <button type="button" className="card" onClick={() => onClick(item)} aria-label={`View ${item.title}`}>
+    <article
+      className="card"
+      role="button"
+      tabIndex={0}
+      onClick={openListing}
+      onKeyDown={handleCardKeyDown}
+      aria-label={`View ${item.title}`}
+    >
       <div className="card-img">
         <span className="card-view-pill">View →</span>
         {imageCount > 0 ? (
-          <img src={item.images[0]} alt={item.title} />
+          <img src={images[cardImgIdx]} alt={`${item.title} photo ${cardImgIdx + 1}`} />
         ) : "🥋"}
-        {imageCount > 1 && <span className="card-photo-count">📷 {imageCount}</span>}
+        {imageCount > 1 && (
+          <>
+            <button
+              className="card-photo-nav card-photo-prev"
+              type="button"
+              onClick={showPreviousCardPhoto}
+              aria-label={`Previous photo for ${item.title}`}
+            >
+              {"\u2039"}
+            </button>
+            <button
+              className="card-photo-nav card-photo-next"
+              type="button"
+              onClick={showNextCardPhoto}
+              aria-label={`Next photo for ${item.title}`}
+            >
+              {"\u203A"}
+            </button>
+            <span className="card-photo-count">{cardImgIdx + 1} / {imageCount}</span>
+          </>
+        )}
       </div>
       <div className="card-body">
         <div className="card-top">
@@ -1502,7 +1597,7 @@ function UniformCard({ item, onClick }) {
           <strong>{item.contactName || "Seller"}</strong>
         </div>
       </div>
-    </button>
+    </article>
   );
 }
 
@@ -1691,27 +1786,54 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
   const [verifying, setVerifying] = useState(false);
   const [removing, setRemoving] = useState(false);
 
-  const images = Array.isArray(currentItem.images) ? currentItem.images : [];
-  const imageCount = images.length;
-  const hasMultipleImages = imageCount > 1;
+  const modalImages = Array.isArray(currentItem.images) ? currentItem.images : [];
+  const hasImages = modalImages.length > 0;
+  const hasMultipleImages = modalImages.length > 1;
+
+  const showPreviousPhoto = (event) => {
+    event?.stopPropagation();
+    if (!hasMultipleImages) return;
+    setImgIdx((idx) => (idx - 1 + modalImages.length) % modalImages.length);
+  };
+
+  const showNextPhoto = (event) => {
+    event?.stopPropagation();
+    if (!hasMultipleImages) return;
+    setImgIdx((idx) => (idx + 1) % modalImages.length);
+  };
 
   useEffect(() => {
-    if (imgIdx >= imageCount) {
+    if (modalImages.length === 0 && imgIdx !== 0) {
+      setImgIdx(0);
+      return;
+    }
+
+    if (modalImages.length > 0 && imgIdx >= modalImages.length) {
       setImgIdx(0);
     }
-  }, [imageCount, imgIdx]);
+  }, [imgIdx, modalImages.length]);
 
-  const showPreviousImage = (event) => {
-    event?.stopPropagation();
-    if (!hasMultipleImages) return;
-    setImgIdx(index => (index - 1 + imageCount) % imageCount);
-  };
+  useEffect(() => {
+    if (!hasMultipleImages || editMode) return undefined;
 
-  const showNextImage = (event) => {
-    event?.stopPropagation();
-    if (!hasMultipleImages) return;
-    setImgIdx(index => (index + 1) % imageCount);
-  };
+    const handleKeyDown = (event) => {
+      const tagName = event.target?.tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tagName)) return;
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setImgIdx((idx) => (idx - 1 + modalImages.length) % modalImages.length);
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setImgIdx((idx) => (idx + 1) % modalImages.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [editMode, hasMultipleImages, modalImages.length]);
 
   const handleVerify = async () => {
     setVerifying(true);
@@ -1764,50 +1886,52 @@ function DetailModal({ item, onClose, onSold, onEdit }) {
       <div className="modal" role="dialog" aria-modal="true" aria-label={currentItem.title}>
         <button className="modal-close" type="button" onClick={onClose} aria-label="Close listing details">✕</button>
         <div className="modal-img">
-          {imageCount > 0 ? (
+          {hasImages ? (
             <>
               <img
-                src={images[imgIdx]}
+                src={modalImages[imgIdx]}
                 alt={`${currentItem.title} photo ${imgIdx + 1}`}
                 style={{ cursor: hasMultipleImages ? "pointer" : "default" }}
-                onClick={(event) => hasMultipleImages && showNextImage(event)}
+                onClick={(event) => hasMultipleImages && showNextPhoto(event)}
               />
               {hasMultipleImages && (
                 <>
                   <button
-                    className="modal-img-arrow modal-img-arrow-left"
+                    className="modal-photo-nav modal-photo-prev"
                     type="button"
-                    onClick={showPreviousImage}
+                    onClick={showPreviousPhoto}
                     aria-label="Previous photo"
                   >
-                    ‹
+                    {"\u2039"}
                   </button>
                   <button
-                    className="modal-img-arrow modal-img-arrow-right"
+                    className="modal-photo-nav modal-photo-next"
                     type="button"
-                    onClick={showNextImage}
+                    onClick={showNextPhoto}
                     aria-label="Next photo"
                   >
-                    ›
+                    {"\u203A"}
                   </button>
-                  <div className="modal-img-counter" aria-live="polite">
-                    {imgIdx + 1} / {imageCount}
-                  </div>
+                  <span className="modal-photo-count">{imgIdx + 1} / {modalImages.length}</span>
                 </>
               )}
             </>
           ) : "🥋"}
         </div>
         {hasMultipleImages && (
-          <div className="modal-dots">
-            {images.map((_, i) => (
+          <div style={{ display: "flex", justifyContent: "center", gap: 6, padding: "8px 0 0", background: "#111E2E" }}>
+            {modalImages.map((_, i) => (
               <button
                 key={i}
-                className={`modal-dot ${i === imgIdx ? "active" : ""}`}
                 type="button"
                 aria-label={`View photo ${i + 1}`}
                 aria-current={i === imgIdx ? "true" : undefined}
                 onClick={() => setImgIdx(i)}
+                style={{
+                  width: 8, height: 8, borderRadius: "50%", border: "none",
+                  background: i === imgIdx ? "#C8102E" : "rgba(255,255,255,0.2)",
+                  cursor: "pointer", padding: 0
+                }}
               />
             ))}
           </div>
