@@ -8,15 +8,21 @@ const SIZES = [
 const CONDITIONS = ["Like New", "Good", "Fair", "Well Loved"];
 const COLORS = ["White", "Black", "Blue", "Other"];
 const EQUIPMENT_TYPES = ["Dobok", "Body Armour", "Helmet", "Sparring Gloves", "Foot Protectors", "Other"];
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest to Oldest" },
+  { value: "oldest", label: "Oldest to Newest" },
+  { value: "priceHigh", label: "Price: High to Low" },
+  { value: "priceLow", label: "Price: Low to High" },
+  { value: "titleAsc", label: "Title: A to Z" },
+];
 
 
 const LISTINGS_STORAGE_KEY = "tkd-listings";
 const ADMIN_SESSION_KEY = "tkd-admin-verified";
 
-// Client-side admin checks are only suitable for a family/club prototype.
-// For a public production marketplace, move admin auth and listing writes to a backend.
-// To enable this temporary client-side admin login, set this to the SHA-256 hex hash
-// of your chosen admin password. Do not put the plain password in this file.
+// This fallback hash is only used if Supabase is not configured.
+// With Supabase enabled, the admin password is checked by database functions.
+// Do not put the plain admin password in this file.
 const ADMIN_PASSWORD_HASH = "";
 const ADMIN_PASSWORD_SESSION_KEY = "tkd-admin-password-session";
 
@@ -39,6 +45,41 @@ const gbp = new Intl.NumberFormat("en-GB", {
 function formatPrice(value) {
   const price = Number(value);
   return Number.isFinite(price) ? gbp.format(price) : "£0.00";
+}
+
+function formatDateShort(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function getListingTimestamp(item) {
+  const value = item?.listedAt || item?.createdAt || item?.created_at || 0;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) ? time : 0;
+}
+
+function compareNewestFirst(a, b) {
+  return getListingTimestamp(b) - getListingTimestamp(a);
+}
+
+function sortListings(items, sortOrder) {
+  const sorted = [...items];
+
+  switch (sortOrder) {
+    case "oldest":
+      return sorted.sort((a, b) => getListingTimestamp(a) - getListingTimestamp(b));
+    case "priceHigh":
+      return sorted.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0) || compareNewestFirst(a, b));
+    case "priceLow":
+      return sorted.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0) || compareNewestFirst(a, b));
+    case "titleAsc":
+      return sorted.sort((a, b) => String(a.title || "").localeCompare(String(b.title || ""), "en-GB", { sensitivity: "base" }) || compareNewestFirst(a, b));
+    case "newest":
+    default:
+      return sorted.sort(compareNewestFirst);
+  }
 }
 
 function normaliseCode(value) {
@@ -75,15 +116,42 @@ async function sha256Hex(value) {
     .join("");
 }
 
+async function verifyRemoteAdminPassword(password) {
+  return Boolean(await supabaseRpc("verify_admin_password", {
+    admin_password: normaliseCode(password),
+  }));
+}
+
 async function verifyAdminPassword(password) {
+  const cleanPassword = normaliseCode(password);
+
+  if (!cleanPassword) {
+    return { ok: false, error: "Please enter the admin password." };
+  }
+
+  if (SUPABASE_ENABLED) {
+    try {
+      const ok = await verifyRemoteAdminPassword(cleanPassword);
+      return {
+        ok,
+        error: ok ? "" : "Incorrect password, or the admin password has not been set in Supabase.",
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error?.message || "Could not verify the admin password with Supabase.",
+      };
+    }
+  }
+
   if (!ADMIN_PASSWORD_HASH) {
     return {
       ok: false,
-      error: "Admin login is not configured. Set ADMIN_PASSWORD_HASH or move admin auth server-side.",
+      error: "Admin login is not configured. Set ADMIN_PASSWORD_HASH or connect Supabase admin verification.",
     };
   }
 
-  const hash = await sha256Hex(password.trim());
+  const hash = await sha256Hex(cleanPassword);
   return {
     ok: hash === ADMIN_PASSWORD_HASH,
     error: hash === ADMIN_PASSWORD_HASH ? "" : "Incorrect password.",
@@ -212,7 +280,7 @@ async function deleteRemoteListing(id, sellerCode) {
 }
 
 async function adminDeleteRemoteListing(id) {
-  const adminPassword = window.sessionStorage?.getItem(ADMIN_PASSWORD_SESSION_KEY) || "";
+  const adminPassword = normaliseCode(window.sessionStorage?.getItem(ADMIN_PASSWORD_SESSION_KEY) || "");
   if (!adminPassword) throw new Error("Admin session expired. Please log in again.");
 
   const deleted = await supabaseRpc("admin_delete_listing", {
@@ -220,7 +288,11 @@ async function adminDeleteRemoteListing(id) {
     admin_password: adminPassword,
   });
 
-  if (!deleted) throw new Error("Admin delete was rejected. Check the admin password hash in Supabase.");
+  if (!deleted) {
+    window.sessionStorage?.removeItem(ADMIN_SESSION_KEY);
+    window.sessionStorage?.removeItem(ADMIN_PASSWORD_SESSION_KEY);
+    throw new Error("Admin delete was rejected. Log out, log back in, and check that the admin password is set in Supabase.");
+  }
 }
 
 async function verifyRemoteSellerCode(id, sellerCode) {
@@ -398,14 +470,22 @@ const styles = `
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body { background: #0B1829; color: #F0EDE8; font-family: 'Barlow', sans-serif; }
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(200,16,46,0.14), transparent 34rem),
+      radial-gradient(circle at top right, rgba(212,168,67,0.10), transparent 30rem),
+      #0B1829;
+    color: #F0EDE8;
+    font-family: 'Barlow', sans-serif;
+  }
 
   .app { min-height: 100vh; }
 
   /* NAV */
   .nav {
-    background: #060F1A;
+    background: rgba(6,15,26,0.94);
     border-bottom: 2px solid #C8102E;
+    backdrop-filter: blur(12px);
     padding: 0 24px;
     display: flex;
     align-items: center;
@@ -489,20 +569,31 @@ const styles = `
   }
   .hero-sub {
     margin-top: 14px;
-    color: #8A9BB0;
-    font-size: 16px;
+    color: #B8C4D2;
+    font-size: 17px;
     font-weight: 400;
-    max-width: 460px;
+    max-width: 560px;
     margin-left: auto;
     margin-right: auto;
     position: relative;
     line-height: 1.6;
   }
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    position: relative;
+  }
+  .hero-actions .btn {
+    box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+  }
   .hero-belt-row {
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin-top: 28px;
+    margin-top: 30px;
     position: relative;
   }
   .belt-chip {
@@ -512,7 +603,7 @@ const styles = `
   }
 
   /* STORE GRID */
-  .store-section { padding: 32px 24px 60px; max-width: 1100px; margin: 0 auto; }
+  .store-section { padding: 34px 24px 64px; max-width: 1120px; margin: 0 auto; }
   .store-header {
     display: flex;
     align-items: center;
@@ -529,6 +620,21 @@ const styles = `
     letter-spacing: 0.04em;
     color: #fff;
   }
+  .store-note {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: -8px 0 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(212,168,67,0.18);
+    border-radius: 12px;
+    background: rgba(212,168,67,0.06);
+    color: #C8D6E5;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .store-note strong { color: #D4A843; }
   .badge {
     background: #C8102E;
     color: #fff;
@@ -560,6 +666,45 @@ const styles = `
   }
   .filter-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
   .filter-btn.active { background: #C8102E; border-color: #C8102E; color: #fff; }
+  .store-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .sort-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 5px 8px 5px 12px;
+    color: #8A9BB0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .sort-select {
+    appearance: none;
+    background: #071321;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    color: #F0EDE8;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    padding: 6px 30px 6px 12px;
+    background-image: linear-gradient(45deg, transparent 50%, #D4A843 50%), linear-gradient(135deg, #D4A843 50%, transparent 50%);
+    background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+  .sort-select:focus { border-color: #C8102E; box-shadow: 0 0 0 3px rgba(200,16,46,0.12); }
 
   .search-bar-wrap {
     position: relative;
@@ -616,11 +761,13 @@ const styles = `
 
   .card {
     width: 100%;
-    background: #111E2E;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
+    position: relative;
+    background: linear-gradient(180deg, #122236 0%, #0F1C2C 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
     overflow: hidden;
-    transition: transform 0.18s, border-color 0.18s;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
     cursor: pointer;
     color: inherit;
     font: inherit;
@@ -628,14 +775,26 @@ const styles = `
     padding: 0;
     appearance: none;
   }
-  .card:hover { transform: translateY(-3px); border-color: rgba(200,16,46,0.4); }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200,16,46,0.48);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.28);
+  }
   .card:focus-visible { outline: 3px solid rgba(200,16,46,0.45); outline-offset: 3px; }
+  .card::before {
+    content: "";
+    display: block;
+    height: 3px;
+    background: linear-gradient(90deg, #C8102E, #D4A843);
+  }
 
   .card-img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background: #0B1829;
+    height: 220px;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255,255,255,0.06), transparent 48%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.022) 0 8px, transparent 8px 16px),
+      #071321;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -643,10 +802,43 @@ const styles = `
     font-size: 48px;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
+    position: relative;
+    padding: 10px;
   }
-  .card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .card-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; border-radius: 10px; background: rgba(255,255,255,0.025); }
+  .card-view-pill {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background: rgba(200,16,46,0.92);
+    border: 1px solid rgba(255,255,255,0.16);
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+    pointer-events: none;
+  }
+  .card-photo-count {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(6,15,26,0.84);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: #fff;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(4px);
+  }
 
-  .card-body { padding: 16px; }
+  .card-body { padding: 17px; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .card-name {
     font-family: 'Barlow Condensed', sans-serif;
@@ -662,6 +854,10 @@ const styles = `
     font-size: 22px;
     color: #D4A843;
     white-space: nowrap;
+    background: rgba(212,168,67,0.10);
+    border: 1px solid rgba(212,168,67,0.16);
+    border-radius: 999px;
+    padding: 2px 10px;
   }
   .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .tag {
@@ -688,17 +884,36 @@ const styles = `
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .card-contact {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    font-size: 13px;
+  .card-seller-box {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid rgba(212,168,67,0.18);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(212,168,67,0.10), rgba(6,15,26,0.34));
     color: #8A9BB0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
-  .card-contact strong { color: #C8102E; }
+  .card-seller-label {
+    display: block;
+    color: #D4A843;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .card-seller-box strong {
+    color: #F0EDE8;
+    display: block;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card-listed {
+    margin-top: 8px;
+    color: #4A6070;
+    font-size: 12px;
+  }
 
   .empty-state {
     grid-column: 1/-1;
@@ -743,15 +958,19 @@ const styles = `
   .modal-close:hover { background: rgba(200,16,46,0.2); color: #fff; }
 
   .modal-img {
-    width: 100%; height: 260px;
-    background: #0B1829;
+    width: 100%; min-height: 280px; height: min(64vh, 520px);
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 48%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.022) 0 8px, transparent 8px 16px),
+      #071321;
     display: flex; align-items: center; justify-content: center;
     font-size: 72px;
     color: #1A2F45;
     border-radius: 16px 16px 0 0;
     overflow: hidden;
+    padding: 12px;
   }
-  .modal-img img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-img img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
 
   .modal-body { padding: 24px; }
   .modal-title {
@@ -910,8 +1129,10 @@ const styles = `
   .previews { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .preview-thumb {
     width: 72px; height: 72px;
-    border-radius: 6px;
-    object-fit: cover;
+    border-radius: 8px;
+    object-fit: contain;
+    background: #0B1829;
+    padding: 4px;
     border: 1px solid rgba(255,255,255,0.1);
     position: relative;
   }
@@ -1051,8 +1272,16 @@ const styles = `
 
   @media (max-width: 600px) {
     .form-row { grid-template-columns: 1fr; }
+    .nav { height: auto; min-height: 64px; padding: 10px 12px; gap: 10px; align-items: flex-start; }
+    .nav-tabs { flex-wrap: wrap; justify-content: flex-end; }
     .nav-tabs .nav-tab { font-size: 12px; padding: 7px 10px; }
-    .hero h1 { font-size: 32px; }
+    .hero { padding: 44px 18px 38px; }
+    .hero h1 { font-size: 34px; }
+    .hero-sub { font-size: 15px; }
+    .grid { grid-template-columns: 1fr; }
+    .card-img { height: 240px; }
+    .modal-img { min-height: 260px; height: 52vh; }
+    .sold-row { flex-direction: column; }
   }
 
   /* FOOTER */
@@ -1158,6 +1387,14 @@ const styles = `
   }
   .link-button:hover, .footer-link:hover { color: #E84060; }
   .checkbox-error { color: #E84060; font-size: 13px; margin-top: -12px; margin-bottom: 16px; }
+
+  @media (max-width: 680px) {
+    .store-controls { justify-content: flex-start; width: 100%; }
+    .sort-control { width: 100%; justify-content: space-between; border-radius: 14px; padding: 8px 10px 8px 12px; }
+    .sort-select { flex: 1; min-width: 0; }
+    .card-img { height: 200px; }
+    .card-view-pill { top: 8px; right: 8px; }
+  }
 `;
 
 
@@ -1169,12 +1406,17 @@ function conditionClass(c) {
 }
 
 function UniformCard({ item, onClick }) {
+  const imageCount = Array.isArray(item.images) ? item.images.length : 0;
+  const listedDate = formatDateShort(item.listedAt);
+
   return (
     <button type="button" className="card" onClick={() => onClick(item)} aria-label={`View ${item.title}`}>
       <div className="card-img">
-        {item.images && item.images.length > 0 ? (
+        <span className="card-view-pill">View →</span>
+        {imageCount > 0 ? (
           <img src={item.images[0]} alt={item.title} />
         ) : "🥋"}
+        {imageCount > 1 && <span className="card-photo-count">📷 {imageCount}</span>}
       </div>
       <div className="card-body">
         <div className="card-top">
@@ -1188,8 +1430,10 @@ function UniformCard({ item, onClick }) {
           {item.condition && <span className={`tag ${conditionClass(item.condition)}`}>{item.condition}</span>}
         </div>
         {item.description && <div className="card-desc">{item.description}</div>}
-        <div className="card-contact">
-          <span>Contact:</span> <strong>{item.contactName}</strong>
+        {listedDate && <div className="card-listed">Listed {listedDate}</div>}
+        <div className="card-seller-box">
+          <span className="card-seller-label">Seller</span>
+          <strong>{item.contactName || "Seller"}</strong>
         </div>
       </div>
     </button>
@@ -1970,6 +2214,7 @@ export default function App() {
   const [listings, setListings] = useState([]);
   const [selected, setSelected] = useState(null);
   const [sizeFilter, setSizeFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [adminLoggedIn, setAdminLoggedIn] = useState(() => {
@@ -2069,11 +2314,12 @@ export default function App() {
     setAdminError("");
 
     try {
-      const result = await verifyAdminPassword(adminPassword);
+      const cleanPassword = normaliseCode(adminPassword);
+      const result = await verifyAdminPassword(cleanPassword);
       if (result.ok) {
         setAdminLoggedIn(true);
         window.sessionStorage?.setItem(ADMIN_SESSION_KEY, "true");
-        window.sessionStorage?.setItem(ADMIN_PASSWORD_SESSION_KEY, adminPassword.trim());
+        window.sessionStorage?.setItem(ADMIN_PASSWORD_SESSION_KEY, cleanPassword);
         setAdminPassword("");
       } else {
         setAdminError(result.error || "Incorrect password.");
@@ -2103,6 +2349,7 @@ export default function App() {
     }
     return true;
   });
+  const sortedListings = sortListings(filtered, sortOrder);
 
   const beltColors = [
     { base: "#FFFFFF", stripe: null },           // White
@@ -2163,6 +2410,10 @@ export default function App() {
             <div className="hero-stripe" />
             <h1>Phoenix Taekwondo<br /><em>Used Uniform Shop</em></h1>
             <p className="hero-sub">Buy and sell used taekwondo uniforms and equipment — doboks, body armour, and more — within the club community.</p>
+            <div className="hero-actions">
+              <button className="btn btn-primary" type="button" onClick={() => setTab("sell")}>List an Item</button>
+              <button className="btn btn-ghost" type="button" onClick={() => document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Browse Listings</button>
+            </div>
             <div className="hero-belt-row">
               {beltColors.map((belt, i) => (
                 <div key={i} className="belt-chip" style={{
@@ -2176,17 +2427,32 @@ export default function App() {
             </div>
           </div>
 
-          <div className="store-section">
+          <div className="store-section" id="listings">
             <div className="store-header">
               <div className="store-title">
                 Current Listings
                 {loaded && <span className="badge">{filtered.length}</span>}
               </div>
-              <div className="filter-row">
-                {["All", "Dobok", "Other"].map(t => (
-                  <button key={t} type="button" className={`filter-btn ${sizeFilter === t ? "active" : ""}`} onClick={() => setSizeFilter(t)}>{t}</button>
-                ))}
+              <div className="store-controls">
+                <div className="filter-row" aria-label="Filter listings">
+                  {["All", "Dobok", "Other"].map(t => (
+                    <button key={t} type="button" className={`filter-btn ${sizeFilter === t ? "active" : ""}`} onClick={() => setSizeFilter(t)}>{t}</button>
+                  ))}
+                </div>
+                <label className="sort-control" htmlFor="listing-sort">
+                  <span>Sort</span>
+                  <select id="listing-sort" className="sort-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+                    {SORT_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
               </div>
+            </div>
+
+            <div className="store-note">
+              <span><strong>Shared club marketplace:</strong> new listings are saved to the database and visible to other visitors.</span>
+              <span>Payments and collection are arranged directly with the seller.</span>
             </div>
 
             <div className="search-bar-wrap">
@@ -2223,7 +2489,7 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                filtered.map(item => (
+                sortedListings.map(item => (
                   <UniformCard key={item.id} item={item} onClick={setSelected} />
                 ))
               )}
@@ -2255,14 +2521,15 @@ export default function App() {
           <div className="admin-login-box">
             <div style={{ fontSize: 36, marginBottom: 10 }}>🛡️</div>
             <h2>Admin Login</h2>
-            <p>Enter the admin password to manage listings.</p>
+            <p>Enter the admin password saved in Supabase to manage listings.</p>
             <div className="form-group">
               <input
                 className="form-input"
                 type="password"
                 placeholder="Password"
+                autoComplete="current-password"
                 value={adminPassword}
-                onChange={e => { setAdminPassword(e.target.value); setAdminError(""); }}
+                onChange={e => { setAdminPassword(normaliseCode(e.target.value)); setAdminError(""); }}
                 onKeyDown={e => e.key === "Enter" && handleAdminLogin()}
                 style={{ textAlign: "center", letterSpacing: "0.15em" }}
               />
