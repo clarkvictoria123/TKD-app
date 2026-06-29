@@ -108,17 +108,18 @@ function renderSizeOptions() {
   ));
 }
 
-function getSellerCodeEmailDetails({ contactEmail, title, secretCode }) {
-  const to = String(contactEmail || "").trim();
-  if (!to) return null;
+function buildSellerCodeEmail({ contactEmail, title, secretCode }) {
+  const cleanEmail = String(contactEmail || "").trim();
+  const cleanTitle = String(title || "your listing").trim() || "your listing";
+  const cleanCode = String(secretCode || "").trim();
 
-  const subject = `Your TKD kit listing code: ${title}`;
+  const subject = `Your TKD kit listing code: ${cleanTitle}`;
   const body = [
     "Hi,",
     "",
-    `Your listing "${title}" is now live on the Phoenix TKD kit marketplace.`,
+    `Your listing "${cleanTitle}" is now live on the Phoenix TKD kit marketplace.`,
     "",
-    `Your seller code is: ${secretCode}`,
+    `Your seller code is: ${cleanCode}`,
     "",
     "Keep this code safe. You will need it to edit your listing or mark the item as sold.",
     "",
@@ -132,52 +133,33 @@ function getSellerCodeEmailDetails({ contactEmail, title, secretCode }) {
     "Housekeeping reminder: please remove the listing once your item has sold, including if it sells elsewhere.",
     "",
     "Thanks for helping the club reuse kit.",
-  ].join("\n");
+  ].join("\r\n");
 
-  return { to, subject, body };
+  // Keep the email address itself unescaped in the mailto path. Some mobile/browser
+  // combinations are less reliable when the @ symbol is percent-encoded.
+  const mailto = cleanEmail
+    ? `mailto:${cleanEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    : "";
+
+  return { to: cleanEmail, subject, body, mailto };
 }
 
-function buildSellerCodeMailto(submitted) {
-  const email = getSellerCodeEmailDetails(submitted);
-  if (!email) return "";
-
-  // Keep the email address itself human-readable. Some email clients do not like an encoded recipient.
-  return `mailto:${email.to}?subject=${encodeURIComponent(email.subject)}&body=${encodeURIComponent(email.body)}`;
-}
-
-function getSellerCodeReminderText(submitted) {
-  const email = getSellerCodeEmailDetails(submitted);
-  if (!email) return `Seller code: ${submitted?.secretCode || ""}`;
-
-  return `${email.subject}\n\n${email.body}`;
-}
-
-async function copyTextToClipboard(text) {
-  if (!text) return false;
-
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    // Fall back to the older textarea method below.
+async function copyToClipboard(text) {
+  if (navigator?.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return true;
   }
 
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.select();
-    const copied = document.execCommand("copy");
-    document.body.removeChild(textarea);
-    return copied;
-  } catch {
-    return false;
-  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textarea);
+  return copied;
 }
 
 function getListingTimestamp(item) {
@@ -1300,8 +1282,8 @@ const styles = `
     background: linear-gradient(180deg, #fff, #f8fafc);
     color: var(--muted);
     display: grid;
-    grid-template-columns: 38px 1fr;
-    gap: 10px;
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 8px 10px;
     align-items: center;
   }
   .card-seller-box::before {
@@ -1312,9 +1294,26 @@ const styles = `
     place-items: center;
     border-radius: 50%;
     background: var(--surface-soft);
+    grid-row: 1 / span 2;
   }
-  .card-seller-label { display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 2px; }
-  .card-seller-box strong { color: var(--ink); display: block; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-seller-label {
+    grid-column: 2;
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .card-seller-box strong {
+    grid-column: 2;
+    color: var(--ink);
+    display: block;
+    font-size: 15px;
+    line-height: 1.25;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
 
   .empty-state { grid-column: 1/-1; text-align: center; padding: 70px 20px; color: var(--muted); }
   .empty-state .icon { font-size: 56px; }
@@ -1525,6 +1524,7 @@ const styles = `
   .success-banner .secret { margin-top: 14px; background: #fff; border: 1px dashed rgba(21,128,61,0.34); border-radius: 12px; padding: 12px 16px; font-family: monospace; font-size: 22px; letter-spacing: 0.15em; color: var(--success); font-weight: 900; }
   .success-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
   .success-small-note { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.45; }
+  .success-notice { display: inline-flex; justify-content: center; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(37, 99, 235, 0.09); color: var(--brand-dark); font-weight: 800; }
 
   /* ADMIN */
   .admin-login-box { max-width: 420px; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 30px; margin: 60px auto; text-align: center; box-shadow: var(--shadow-sm); }
@@ -2131,7 +2131,7 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   const [drag, setDrag] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [copyStatus, setCopyStatus] = useState("");
+  const [successNotice, setSuccessNotice] = useState("");
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -2155,7 +2155,29 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
     setAgreed(false);
     setErrors({});
     setSubmitError("");
-    setCopyStatus("");
+    setSuccessNotice("");
+  };
+
+  const handleCopyReminder = async () => {
+    if (!submitted) return;
+    const reminder = buildSellerCodeEmail(submitted);
+    const textToCopy = submitted.contactEmail
+      ? `To: ${reminder.to}\nSubject: ${reminder.subject}\n\n${reminder.body}`
+      : `Seller code: ${submitted.secretCode}`;
+
+    try {
+      const copied = await copyToClipboard(textToCopy);
+      setSuccessNotice(copied ? "Copied the seller code and instructions." : "Could not copy automatically. Please screenshot the code.");
+    } catch {
+      setSuccessNotice("Could not copy automatically. Please screenshot the code.");
+    }
+  };
+
+  const handleOpenEmailDraft = () => {
+    if (!submitted?.contactEmail) return;
+    const reminder = buildSellerCodeEmail(submitted);
+    setSuccessNotice("Opening your email app now. If nothing opens, use Copy code & instructions instead.");
+    window.location.href = reminder.mailto;
   };
 
   const handleSubmit = async (event) => {
@@ -2188,19 +2210,6 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
   };
 
   if (submitted) {
-    const emailDraftHref = buildSellerCodeMailto(submitted);
-    const reminderText = getSellerCodeReminderText(submitted);
-
-    const handleCopyReminder = async () => {
-      const copied = await copyTextToClipboard(reminderText);
-      setCopyStatus(copied ? "Reminder text copied. Paste it into any email, note or message." : "Copy failed. Please screenshot the code before leaving this page.");
-    };
-
-    const handleCopyCode = async () => {
-      const copied = await copyTextToClipboard(submitted.secretCode);
-      setCopyStatus(copied ? "Seller code copied." : "Copy failed. Please screenshot the code before leaving this page.");
-    };
-
     return (
       <div className="form-section">
         <div className="success-banner" role="status">
@@ -2212,17 +2221,16 @@ function SubmitForm({ onSubmitted, onViewTerms, onViewStore }) {
           <div className="secret">{submitted.secretCode}</div>
           <div className="success-actions">
             {submitted.contactEmail && (
-              <a className="btn btn-ghost btn-sm" href={emailDraftHref}>✉️ Open email draft</a>
+              <button className="btn btn-ghost btn-sm" type="button" onClick={handleOpenEmailDraft}>✉️ Open email draft</button>
             )}
-            <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyReminder}>📋 Copy reminder text</button>
-            <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyCode}>Copy code only</button>
+            <button className="btn btn-ghost btn-sm" type="button" onClick={handleCopyReminder}>📋 Copy code & instructions</button>
           </div>
-          {copyStatus && <p className="success-small-note" role="status"><strong>{copyStatus}</strong></p>}
+          {successNotice && <p className="success-small-note success-notice" role="status">{successNotice}</p>}
           <p className="success-small-note">Screenshot this code and keep it safe. Use it to edit your listing or mark it as sold. Please remove the listing if the item sells elsewhere.</p>
           {submitted.contactEmail ? (
-            <p className="success-small-note"><strong>Note:</strong> “Open email draft” uses your device's default email app. If nothing opens, use “Copy reminder text” and paste it into your email or notes.</p>
+            <p className="success-small-note"><strong>Note:</strong> this opens a ready-made email on the seller's device. It cannot send automatically unless a backend email service is added.</p>
           ) : (
-            <p className="success-small-note"><strong>No email was provided.</strong> Use “Copy reminder text”, copy the code, or screenshot it before leaving this page.</p>
+            <p className="success-small-note"><strong>No email was provided, so we cannot prepare an email reminder.</strong> Copy or screenshot the code before leaving this page.</p>
           )}
         </div>
         <div className="edit-save-row">
