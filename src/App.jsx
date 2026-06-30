@@ -62,13 +62,6 @@ const SORT_OPTIONS = [
   { value: "titleAsc", label: "Title: A to Z" },
 ];
 
-const PRICE_FILTER_OPTIONS = [
-  { value: "Any", label: "Any" },
-  { value: "under10", label: "Under £10" },
-  { value: "10to25", label: "£10 to £25" },
-  { value: "25to50", label: "£25 to £50" },
-  { value: "over50", label: "£50+" },
-];
 
 const LISTINGS_STORAGE_KEY = "tkd-listings";
 const ADMIN_SESSION_KEY = "tkd-admin-verified";
@@ -582,7 +575,7 @@ function useImageUpload(initialImages = []) {
 }
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap');
 
   :root {
     --ink: #130b0e;
@@ -2142,373 +2135,6 @@ const styles = `
   }
 
 
-
-  /* FINAL MOCKUP MATCH: dark hero, light shopfront, pink cards */
-  body,
-  button,
-  input,
-  select,
-  textarea {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-  }
-
-  .app { background: #f8fafc !important; }
-
-  .nav {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 120;
-    min-height: 66px !important;
-    padding: 0 clamp(20px, 4.2vw, 52px) !important;
-    background: transparent !important;
-    border-bottom: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    color: #fff !important;
-  }
-  .nav-logo { gap: 12px !important; color: #fff !important; font-weight: 400 !important; }
-  .nav-logo > span.nav-phoenix,
-  .nav-logo > span:first-child {
-    width: auto !important;
-    height: auto !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    color: #ed1b2f !important;
-  }
-  .nav-phoenix { font-size: 30px !important; line-height: 1; filter: hue-rotate(145deg) saturate(2.8); }
-  .nav-brand-text { font-size: clamp(17px, 1.5vw, 24px); font-weight: 400; letter-spacing: -0.02em; }
-  .nav-tabs { gap: clamp(10px, 1.8vw, 28px) !important; }
-  .nav-tab {
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 999px !important;
-    box-shadow: none !important;
-    color: #fff !important;
-    font-size: 15px !important;
-    font-weight: 500 !important;
-    padding: 9px 4px !important;
-    text-transform: none !important;
-  }
-  .nav-tab:hover,
-  .nav-tab.active { color: #fff !important; background: transparent !important; text-decoration: underline; text-underline-offset: 5px; }
-  .nav-user {
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,0.72);
-    background: rgba(255,255,255,0.04);
-    color: #fff;
-    font-size: 28px;
-    line-height: 1;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-  }
-
-  .hero {
-    min-height: 560px !important;
-    background: #05090e !important;
-    border-bottom: none !important;
-  }
-  .hero::before { display: none !important; }
-  .hero-inner {
-    max-width: none !important;
-    min-height: 560px !important;
-    padding: 92px clamp(20px, 4.2vw, 68px) 58px !important;
-    display: block !important;
-    overflow: hidden;
-  }
-  .hero-inner::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background:
-      linear-gradient(90deg,
-        rgba(5,8,13,0.55) 0%,
-        rgba(5,8,13,0.35) 30%,
-        rgba(5,8,13,0.10) 57%,
-        rgba(5,8,13,0.02) 100%),
-      linear-gradient(180deg, rgba(5,8,13,0.13), rgba(5,8,13,0.0) 42%, rgba(5,8,13,0.16));
-  }
-  .hero-copy {
-    position: relative;
-    z-index: 3;
-    max-width: 500px !important;
-    padding-top: 4px;
-  }
-  .hero-kicker { display: none !important; }
-  .hero h1 {
-    color: #fff !important;
-    font-size: clamp(46px, 4.7vw, 72px) !important;
-    font-weight: 300 !important;
-    line-height: 1.03 !important;
-    letter-spacing: -0.055em !important;
-  }
-  .hero h1 span {
-    color: #ed1b2f !important;
-    font-weight: 400 !important;
-  }
-  .hero-sub {
-    margin-top: 22px !important;
-    max-width: 390px !important;
-    color: rgba(255,255,255,0.92) !important;
-    font-size: 17px !important;
-    line-height: 1.55 !important;
-    font-weight: 400 !important;
-  }
-  .hero-actions { margin-top: 26px !important; gap: 18px !important; }
-  .hero-actions .btn {
-    min-height: 49px !important;
-    border-radius: 7px !important;
-    padding: 0 24px !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    box-shadow: 0 18px 34px rgba(0,0,0,0.22) !important;
-  }
-  .hero-actions .btn-primary { background: #e30613 !important; border-color: #e30613 !important; color: #fff !important; }
-  .hero-actions .btn-ghost { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.55) !important; color: #fff !important; }
-  .hero-trust-row {
-    margin-top: 30px !important;
-    gap: 28px !important;
-    color: #fff !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-  }
-  .hero-trust-row span { max-width: 130px; line-height: 1.25; }
-  .hero-visual {
-    position: absolute !important;
-    inset: 0 !important;
-    border-radius: 0 !important;
-    min-height: 0 !important;
-    background: transparent !important;
-    z-index: 0 !important;
-    pointer-events: none;
-  }
-  .hero-kit-image {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center right !important;
-    filter: saturate(1.05) contrast(1.04) brightness(1.02) !important;
-  }
-  .gear-stage { display: none !important; }
-
-  .store-section {
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 24px clamp(18px, 3.8vw, 58px) 72px !important;
-    background: linear-gradient(180deg, #fbfcfd 0%, #f7f8fa 72%, #ffffff 100%) !important;
-    color: #101722 !important;
-  }
-  .store-toolbar,
-  .listing-summary,
-  .search-results-info,
-  .grid,
-  .empty-state {
-    max-width: 1420px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .store-toolbar {
-    display: grid;
-    grid-template-columns: minmax(240px, 1.55fr) minmax(220px, 1.12fr) minmax(160px, 0.82fr) minmax(160px, 0.82fr) minmax(230px, 1.12fr) auto;
-    gap: 24px;
-    align-items: center;
-    margin-bottom: 22px;
-  }
-  .marketplace-search { margin: 0 !important; min-width: 0; }
-  .toolbar-select,
-  .marketplace-search {
-    display: flex;
-    align-items: center;
-    min-height: 45px;
-    border-radius: 6px;
-    background: #fff !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.05) !important;
-    overflow: hidden;
-  }
-  .toolbar-select span {
-    padding: 0 16px;
-    color: #171c24;
-    font-size: 14px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .toolbar-select .sort-select {
-    min-width: 0 !important;
-    width: 100%;
-    height: 45px;
-    border: 0 !important;
-    border-left: 1px solid #edf0f4 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #17202b !important;
-    padding-left: 14px !important;
-  }
-  .toolbar-select-small .sort-select { max-width: 110px; }
-  .search-bar-icon {
-    left: 18px !important;
-    color: #111827 !important;
-    font-size: 20px !important;
-    opacity: 1 !important;
-  }
-  .search-bar {
-    height: 45px !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 44px 0 50px !important;
-    font-size: 14px !important;
-    color: #111827 !important;
-  }
-  .search-bar::placeholder { color: #88919e !important; }
-  .search-clear { right: 8px !important; }
-  .reset-controls-btn {
-    min-height: 45px !important;
-    border-radius: 6px !important;
-    background: #fff !important;
-    color: #e30613 !important;
-    border: 1px solid rgba(227,6,19,0.36) !important;
-    box-shadow: none !important;
-    padding: 0 18px !important;
-    white-space: nowrap;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-  }
-  .reset-controls-btn:hover:not(:disabled),
-  .reset-controls-btn:focus-visible { background: #e30613 !important; color: #fff !important; }
-  .listing-summary {
-    margin-top: -8px;
-    margin-bottom: 20px;
-    color: #657081;
-    font-size: 14px;
-    text-align: right;
-  }
-
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)) !important;
-    gap: 16px !important;
-  }
-  .card {
-    border-radius: 8px !important;
-    overflow: hidden !important;
-    background: linear-gradient(180deg, #ffe0e0 0%, #fff3f3 68%, #fff8f8 100%) !important;
-    border: 1px solid #f5c9c9 !important;
-    box-shadow: 0 12px 22px rgba(115,30,35,0.10) !important;
-    color: #101722 !important;
-  }
-  .card:hover { transform: translateY(-3px) !important; box-shadow: 0 16px 34px rgba(115,30,35,0.15) !important; }
-  .card-img {
-    height: 180px !important;
-    background: linear-gradient(135deg, #ffd5d5 0%, #fff1f1 100%) !important;
-    border-bottom: 0 !important;
-    padding: 12px !important;
-  }
-  .card-img img { border-radius: 6px !important; object-fit: contain !important; filter: drop-shadow(0 15px 16px rgba(110,20,25,0.10)) !important; }
-  .card-body { padding: 17px 18px 16px !important; }
-  .card-top { display: block !important; }
-  .card-name {
-    color: #111827 !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-    margin-bottom: 12px;
-  }
-  .card-price {
-    color: #e30613 !important;
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    text-shadow: none !important;
-    margin-bottom: 12px;
-  }
-  .card-tags,
-  .card-desc { display: none !important; }
-  .card-footer-row {
-    min-height: 39px !important;
-    margin-top: 8px !important;
-    padding: 12px 4px 0 !important;
-    border-width: 1px 0 0 0 !important;
-    border-color: rgba(227,6,19,0.15) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    color: #1f2937 !important;
-  }
-  .card-footer-row span:first-child {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 14px;
-    font-weight: 400;
-  }
-  .card-footer-row span:first-child::before {
-    content: "♙";
-    color: #e30613;
-    font-size: 22px;
-    line-height: 1;
-  }
-  .card-footer-cta {
-    font-size: 0 !important;
-    color: #e30613 !important;
-  }
-  .card-footer-cta::after {
-    content: "›";
-    font-size: 28px;
-    line-height: 1;
-    color: #e30613;
-  }
-  .card-photo-nav {
-    background: rgba(255,255,255,0.96) !important;
-    color: #111827 !important;
-    width: 34px !important;
-    height: 34px !important;
-    border: 0 !important;
-    box-shadow: 0 8px 18px rgba(15,23,42,0.12) !important;
-  }
-  .card-photo-count { background: rgba(0,0,0,0.62) !important; }
-
-  .footer-support {
-    max-width: 840px;
-    margin: 26px auto 0;
-    border-radius: 6px;
-    padding: 14px 20px;
-    background: linear-gradient(90deg, rgba(255,255,255,0), #ffffff, rgba(255,255,255,0));
-    color: #3f4752;
-    text-align: center;
-    font-size: 16px;
-  }
-
-  @media (max-width: 1120px) {
-    .store-toolbar { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .reset-controls-btn { width: 100%; justify-content: center; }
-    .listing-summary { text-align: left; }
-  }
-  @media (max-width: 840px) {
-    .nav { position: relative !important; background: #070b10 !important; flex-wrap: wrap; padding: 12px 18px !important; }
-    .nav-tabs { width: 100%; justify-content: flex-start; gap: 12px !important; overflow-x: auto; }
-    .nav-tab { padding: 8px 0 !important; }
-    .hero-inner { min-height: 680px !important; padding: 40px 20px 36px !important; display: flex !important; align-items: flex-end !important; }
-    .hero-kit-image { object-position: 63% center !important; }
-    .hero h1 { font-size: 44px !important; }
-    .store-toolbar { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 560px) {
-    .hero-actions .btn { width: 100%; justify-content: center; }
-    .hero-trust-row { gap: 14px !important; }
-    .toolbar-select { align-items: stretch; }
-    .toolbar-select span { min-width: 136px; display: flex; align-items: center; }
-    .grid { grid-template-columns: 1fr !important; }
-  }
-
 `;
 
 
@@ -3521,9 +3147,7 @@ export default function App() {
   const [prevTab, setPrevTab] = useState("store");
   const [listings, setListings] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [equipmentFilter, setEquipmentFilter] = useState("All");
-  const [listingSizeFilter, setListingSizeFilter] = useState("All");
-  const [priceFilter, setPriceFilter] = useState("Any");
+  const [sizeFilter, setSizeFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("newest");
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -3643,15 +3267,8 @@ export default function App() {
 
   
   const filtered = listings.filter(l => {
-    if (equipmentFilter !== "All" && normaliseEquipmentType(l.equipmentType) !== equipmentFilter) return false;
-    if (listingSizeFilter !== "All" && l.size !== listingSizeFilter) return false;
-
-    const listingPrice = Number(l.price) || 0;
-    if (priceFilter === "under10" && listingPrice >= 10) return false;
-    if (priceFilter === "10to25" && (listingPrice < 10 || listingPrice > 25)) return false;
-    if (priceFilter === "25to50" && (listingPrice < 25 || listingPrice > 50)) return false;
-    if (priceFilter === "over50" && listingPrice < 50) return false;
-
+    if (sizeFilter === "Dobok") { if (l.equipmentType !== "Dobok") return false; }
+    else if (sizeFilter === "Other") { if (l.equipmentType === "Dobok") return false; }
     if (search.trim()) {
       const q = search.toLowerCase();
       return (
@@ -3661,19 +3278,16 @@ export default function App() {
         l.size?.toLowerCase().includes(q) ||
         l.condition?.toLowerCase().includes(q) ||
         l.equipmentType?.toLowerCase().includes(q) ||
-        l.color?.toLowerCase().includes(q) ||
         l.contactName?.toLowerCase().includes(q)
       );
     }
     return true;
   });
   const sortedListings = sortListings(filtered, sortOrder);
-  const hasActiveListingControls = Boolean(search.trim()) || equipmentFilter !== "All" || listingSizeFilter !== "All" || priceFilter !== "Any" || sortOrder !== "newest";
+  const hasActiveListingControls = Boolean(search.trim()) || sizeFilter !== "All" || sortOrder !== "newest";
   const resetListingControls = () => {
     setSearch("");
-    setEquipmentFilter("All");
-    setListingSizeFilter("All");
-    setPriceFilter("Any");
+    setSizeFilter("All");
     setSortOrder("newest");
   };
 
@@ -3705,17 +3319,26 @@ export default function App() {
           style={{ cursor: "default", userSelect: "none" }}
           aria-label="Phoenix Taekwondo marketplace logo"
         >
-          <span className="nav-phoenix" aria-hidden="true">🔥</span>
-          <span className="nav-brand-text">Phoenix TKD Marketplace</span>
+          <span style={{ fontSize: 26, lineHeight: 1 }}>🥋</span>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.06em", lineHeight: 1.2 }}>
+              PHOENIX <span style={{ color: "#c8102e" }}>TKD KIT</span>
+            </div>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#c9d2df", lineHeight: 1.2, textTransform: "uppercase" }}>
+              Pre-loved kit marketplace
+            </div>
+          </div>
         </div>
         <div className="nav-tabs">
-          <button type="button" className="nav-tab" onClick={() => { setTab("store"); setTimeout(() => document.getElementById("listings")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }}>
-            Browse Listings
+          <button type="button" className={`nav-tab ${tab === "store" ? "active" : ""}`} onClick={() => setTab("store")}>
+            Store {listings.length > 0 && <span className="badge">{listings.length}</span>}
           </button>
-          <button type="button" className="nav-tab" onClick={() => setTab("sell")}>List an Item</button>
-          <button type="button" className="nav-tab" onClick={() => { setPrevTab(tab); setTab("terms"); }}>About</button>
-          <button type="button" className="nav-tab" onClick={() => setTab("admin")}>Admin</button>
-          <button type="button" className="nav-user" aria-label="Admin login" onClick={() => setTab("admin")}>◎</button>
+          <button type="button" className={`nav-tab ${tab === "sell" ? "active" : ""}`} onClick={() => setTab("sell")}>
+            List an Item
+          </button>
+          <button type="button" className={`nav-tab ${tab === "terms" ? "active" : ""}`} onClick={() => { setPrevTab(tab); setTab("terms"); }} style={{ textTransform: "none" }}>
+            T&amp;Cs
+          </button>
         </div>
       </nav>
 
@@ -3727,7 +3350,7 @@ export default function App() {
             <div className="hero-inner">
               <div className="hero-copy">
                 <div className="hero-kicker">Phoenix TKD community</div>
-                <h1 id="hero-title">Phoenix Taekwondo's<br /><span>Pre-Loved Kit</span><br />Marketplace</h1>
+                <h1 id="hero-title">Pre-loved<br /><span>Taekwondo Kit</span><br />Marketplace</h1>
                 <p className="hero-sub">Buy and sell outgrown uniforms, belts, sparring gear and club kit within the Phoenix TKD community.</p>
                 <div className="hero-actions">
                   <button className="btn btn-primary" type="button" onClick={() => setTab("sell")}>＋ List an Item</button>
@@ -3767,64 +3390,53 @@ export default function App() {
           </section>
 
           <div className="store-section" id="listings">
-            <div className="store-toolbar" aria-label="Search, filter and sort listings">
-              <div className="search-bar-wrap marketplace-search">
-                <span className="search-bar-icon">⌕</span>
-                <input
-                  className="search-bar"
-                  placeholder="Search listings..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  aria-label="Search listings"
-                />
-                {search && (
-                  <button className="search-clear" type="button" onClick={() => setSearch("")} aria-label="Clear search">×</button>
-                )}
+            <div className="store-header">
+              <div className="store-title">
+                Sort & Browse
+                {loaded && <span className="badge">{filtered.length}</span>}
               </div>
-
-              <label className="toolbar-select" htmlFor="equipment-filter">
-                <span>Equipment type</span>
-                <select id="equipment-filter" className="sort-select" value={equipmentFilter} onChange={e => setEquipmentFilter(e.target.value)}>
-                  <option value="All">All</option>
-                  {EQUIPMENT_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
-                </select>
-              </label>
-
-              <label className="toolbar-select toolbar-select-small" htmlFor="size-filter">
-                <span>Size</span>
-                <select id="size-filter" className="sort-select" value={listingSizeFilter} onChange={e => setListingSizeFilter(e.target.value)}>
-                  <option value="All">All</option>
-                  {renderSizeOptions()}
-                </select>
-              </label>
-
-              <label className="toolbar-select toolbar-select-small" htmlFor="price-filter">
-                <span>Price</span>
-                <select id="price-filter" className="sort-select" value={priceFilter} onChange={e => setPriceFilter(e.target.value)}>
-                  {PRICE_FILTER_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </select>
-              </label>
-
-              <label className="toolbar-select" htmlFor="listing-sort">
-                <span>Sort by</span>
-                <select id="listing-sort" className="sort-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
-                  {SORT_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </select>
-              </label>
-
-              <button
-                className="reset-controls-btn"
-                type="button"
-                onClick={resetListingControls}
-                disabled={!hasActiveListingControls}
-                aria-label="Reset search, filters and sort order"
-              >
-                ↻ Reset filters
-              </button>
+              <div className="store-controls">
+                <div className="filter-row" aria-label="Filter listings">
+                  {["All", "Dobok", "Other"].map(t => (
+                    <button key={t} type="button" className={`filter-btn ${sizeFilter === t ? "active" : ""}`} onClick={() => setSizeFilter(t)}>{t}</button>
+                  ))}
+                </div>
+                <label className="sort-control" htmlFor="listing-sort">
+                  <span>Sort</span>
+                  <select id="listing-sort" className="sort-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
+                    {SORT_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  className="reset-controls-btn"
+                  type="button"
+                  onClick={resetListingControls}
+                  disabled={!hasActiveListingControls}
+                  aria-label="Reset search, filters and sort order"
+                >
+                  ↻ Reset filters
+                </button>
+              </div>
             </div>
 
-            <div className="listing-summary" aria-live="polite">
-              {loaded ? `Showing ${filtered.length === listings.length ? "all" : filtered.length} listing${filtered.length === 1 ? "" : "s"}` : "Loading listings"}
+            <div className="store-note">
+              <span><strong>Shared club marketplace:</strong> new listings are saved to the database and visible to other visitors.</span>
+              <span>Payments and collection are arranged directly with the seller.</span>
+            </div>
+
+            <div className="search-bar-wrap">
+              <span className="search-bar-icon">🔍</span>
+              <input
+                className="search-bar"
+                placeholder="Search by title, brand, size, condition…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+              {search && (
+                <button className="search-clear" type="button" onClick={() => setSearch("")} aria-label="Clear search">✕</button>
+              )}
             </div>
 
             {search.trim() && (
@@ -3842,7 +3454,7 @@ export default function App() {
               ) : filtered.length === 0 ? (
                 <div className="empty-state">
                   <div className="icon">🥋</div>
-                  <p style={{ color: "#451018", fontSize: 18, fontFamily: "'Inter', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
+                  <p style={{ color: "#451018", fontSize: 18, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
                     {hasActiveListingControls ? "No matching listings" : "No listings yet"}
                   </p>
                   <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
@@ -3858,10 +3470,6 @@ export default function App() {
                   <UniformCard key={item.id} item={item} onClick={setSelected} />
                 ))
               )}
-            </div>
-
-            <div className="footer-support">
-              <span aria-hidden="true">❤️</span> Thank you for supporting our Phoenix TKD community!
             </div>
           </div>
         </>
