@@ -29,7 +29,7 @@ const EQUIPMENT_TYPES = [
   "Dobok",
   "Body Armour",
   "Belt",
-  "Paddles / Training Aids",
+  "Mitts / Training Aids",
   "T-Shirts & Hoodies",
   "Other Clothing",
   "Other",
@@ -3350,7 +3350,7 @@ export default function App() {
             <div className="hero-inner">
               <div className="hero-copy">
                 <div className="hero-kicker">Phoenix TKD community</div>
-                <h1 id="hero-title">Pre-loved<br /><span>Taekwondo Kit</span><br />Marketplace</h1>
+                <h1 id="hero-title">Phoenix Taekwondo's Pre-loved<br /><span>Kit Marketplace<span/></h1>
                 <p className="hero-sub">Buy and sell outgrown uniforms, belts, sparring gear and club kit within the Phoenix TKD community.</p>
                 <div className="hero-actions">
                   <button className="btn btn-primary" type="button" onClick={() => setTab("sell")}>＋ List an Item</button>
